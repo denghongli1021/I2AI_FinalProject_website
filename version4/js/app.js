@@ -58,7 +58,7 @@ const PAGE_NAMES = {
   experiments: '實驗室',
   leaderboard: '模型排行榜',
   insights: '洞察與決策',
-  deployments: '部署與 API',
+  // deployments: '部署與 API',
   settings: '系統設定',
 };
 
