@@ -1885,6 +1885,13 @@ function renderRealLeaderboard() {
 
   const isReg = models[0].taskType === 'regression';
 
+  // Update dataset dropdown
+  const lbSelect = document.getElementById('lb-dataset-select');
+  if (lbSelect) {
+    const dsName = DataEngine.currentDataset ? DataEngine.currentDataset.fileName : '當前數據集';
+    lbSelect.innerHTML = `<option>${escapeHtml(dsName)}</option>`;
+  }
+
   // Update column headers
   const col1 = document.getElementById('lb-col1');
   const col2 = document.getElementById('lb-col2');
@@ -1942,6 +1949,97 @@ function renderRealLeaderboard() {
     `;
     tbody.appendChild(tr);
   });
+
+  // Bind compare functionality for real models
+  initRealCompare(models, isReg);
+}
+
+function initRealCompare(models, isReg) {
+  const compareBtn = document.getElementById('btn-compare');
+  const selectAllCb = document.getElementById('select-all-models');
+  if (!compareBtn) return;
+
+  const updateCompareState = () => {
+    const checked = document.querySelectorAll('.model-select-cb:checked');
+    compareBtn.disabled = checked.length < 2;
+  };
+
+  // Rebind checkboxes
+  document.querySelectorAll('.model-select-cb').forEach(cb => {
+    cb.addEventListener('change', updateCompareState);
+  });
+
+  if (selectAllCb) {
+    selectAllCb.addEventListener('change', () => {
+      const cbs = document.querySelectorAll('.model-select-cb');
+      cbs.forEach((cb, i) => { cb.checked = selectAllCb.checked && i < 3; });
+      updateCompareState();
+    });
+  }
+
+  // Compare button click
+  const newBtn = compareBtn.cloneNode(true);
+  compareBtn.parentNode.replaceChild(newBtn, compareBtn);
+  newBtn.disabled = true;
+  newBtn.addEventListener('click', () => {
+    const checkedIdxs = [...document.querySelectorAll('.model-select-cb:checked')].map(cb => parseInt(cb.dataset.idx));
+    if (checkedIdxs.length < 2) return;
+    const selected = checkedIdxs.map(i => models[i]).filter(Boolean);
+    const modal = document.getElementById('compare-modal');
+    modal.classList.remove('hidden');
+    setTimeout(() => renderRealCompareCharts(selected, isReg), 100);
+  });
+}
+
+function renderRealCompareCharts(models, isReg) {
+  // Radar chart
+  const radarChart = initChart('chart-compare-radar');
+  if (radarChart) {
+    const indicators = isReg
+      ? [{ name: 'R²', max: 1 }, { name: '1-RMSE(norm)', max: 1 }, { name: '1-MAE(norm)', max: 1 }]
+      : [{ name: 'Accuracy', max: 1 }, { name: 'F1', max: 1 }, { name: 'Precision', max: 1 }];
+
+    const maxRMSE = Math.max(...models.map(m => m.metrics.testRMSE || 1));
+    const maxMAE = Math.max(...models.map(m => m.metrics.testMAE || 1));
+    const colors = ['#3b82f6', '#22d3ee', '#f59e0b', '#10b981'];
+
+    const series = models.map((m, i) => ({
+      name: m.name,
+      value: isReg
+        ? [Math.max(0, m.metrics.testR2), 1 - (m.metrics.testRMSE / maxRMSE), 1 - (m.metrics.testMAE / maxMAE)]
+        : [m.metrics.testAccuracy || 0, m.metrics.f1 || 0, m.metrics.precision || 0],
+      lineStyle: { color: colors[i % colors.length] },
+      itemStyle: { color: colors[i % colors.length] },
+      areaStyle: { color: colors[i % colors.length], opacity: 0.1 },
+    }));
+
+    radarChart.setOption({
+      tooltip: { backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0', fontSize: 11 } },
+      legend: { data: models.map(m => m.name), bottom: 0, textStyle: { color: '#94a3b8', fontSize: 10 } },
+      radar: { indicator: indicators, axisName: { color: '#94a3b8', fontSize: 10 }, splitLine: { lineStyle: { color: '#1e293b' } }, splitArea: { areaStyle: { color: ['transparent'] } } },
+      series: [{ type: 'radar', data: series }],
+    });
+  }
+
+  // Bar comparison
+  const confChart = initChart('chart-compare-confusion');
+  if (confChart) {
+    const scoreLabel = isReg ? 'R²' : 'Accuracy';
+    const scores = models.map(m => m.metrics.testScore);
+    const colors = scores.map(s => s > 0.8 ? '#10b981' : s > 0.5 ? '#f59e0b' : '#f87171');
+
+    confChart.setOption({
+      tooltip: { trigger: 'axis', backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0', fontSize: 11 } },
+      grid: { left: 50, right: 20, top: 15, bottom: 40 },
+      xAxis: { type: 'category', data: models.map(m => m.name), axisLabel: { color: '#94a3b8', fontSize: 9, rotate: 20 } },
+      yAxis: { type: 'value', name: scoreLabel, nameTextStyle: { color: '#64748b' }, axisLabel: { color: '#64748b', fontSize: 9 }, splitLine: { lineStyle: { color: '#1e293b' } } },
+      series: [{
+        type: 'bar', data: scores.map((s, i) => ({ value: s, itemStyle: { color: colors[i] } })),
+        barWidth: '40%', itemStyle: { borderRadius: [4, 4, 0, 0] },
+        label: { show: true, position: 'top', color: '#e2e8f0', fontSize: 9, formatter: p => p.value.toFixed(4) },
+      }],
+    });
+  }
 }
 
 // ===== REAL INSIGHTS =====

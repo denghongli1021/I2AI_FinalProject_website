@@ -39,7 +39,7 @@
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </div>
         <div>
-          <h1 class="text-lg font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">AutoML Pro</h1>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">AutoML</h1>
           <p class="text-[10px] text-dark-400 tracking-wider uppercase">Intelligence Platform</p>
         </div>
       </div>
@@ -91,7 +91,7 @@
     </div>
 
     <!-- User -->
-    <div class="p-4 border-t border-dark-700/50">
+    <!-- <div class="p-4 border-t border-dark-700/50">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-sm font-bold">A</div>
         <div class="flex-1 min-w-0">
@@ -99,7 +99,7 @@
           <p class="text-xs text-dark-400 truncate">admin@automl.pro</p>
         </div>
       </div>
-    </div>
+    </div> -->
   </aside>
 
   <!-- ===== MAIN CONTENT ===== -->
@@ -511,66 +511,7 @@
         </div>
       </section>
       
-      <section id="page-insights" class="page-section hidden">
-        <div class="mb-6 flex items-center justify-between">
-          <div>
-            <h2 class="text-xl font-bold">洞察與決策</h2>
-            <p class="text-sm text-dark-400 mt-1">檢視模型的特徵重要性與關鍵效能指標</p>
-          </div>
-          <select id="insight-model-select"
-            class="bg-dark-800 border border-dark-600 rounded-lg px-4 py-2 text-sm focus:border-primary-500 outline-none">
-            <option value="best">最佳模型 (自動選擇)</option>
-          </select>
-        </div>
-      
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div class="card p-4 flex items-center gap-4 border-l-4 border-success-500">
-            <div class="w-12 h-12 rounded-full bg-success-500/10 flex items-center justify-center text-success-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm text-dark-400">模型準確率 (Accuracy / R²)</p>
-              <h3 class="text-2xl font-bold mt-1" id="insight-accuracy-value">-- %</h3>
-            </div>
-          </div>
-      
-          <div class="card p-4 flex items-center gap-4 border-l-4 border-warning-500">
-            <div class="w-12 h-12 rounded-full bg-warning-500/10 flex items-center justify-center text-warning-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm text-dark-400">訓練耗時 (Time)</p>
-              <h3 class="text-2xl font-bold mt-1" id="insight-time-value">-- ms</h3>
-            </div>
-          </div>
-      
-          <div class="card p-4 flex items-center gap-4 border-l-4 border-primary-500">
-            <div class="w-12 h-12 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm text-dark-400">使用特徵數量</p>
-              <h3 class="text-2xl font-bold mt-1" id="insight-feature-count">--</h3>
-            </div>
-          </div>
-        </div>
-      
-        <div class="card mb-6">
-          <div class="card-header">
-            <h3 class="card-title">特徵重要性 (Feature Importance)</h3>
-          </div>
-          <div id="chart-feature-importance" class="h-80"></div>
-        </div>
-      </section>
+      <!-- first insights section removed — merged into the second page-insights below -->
       
       <!-- ===== PAGE: EXPERIMENTS ===== -->
       <section id="page-experiments" class="page-section hidden">
@@ -915,7 +856,7 @@
           <div class="card-header">
             <h3 class="card-title">模型排行榜</h3>
             <div class="flex items-center gap-3">
-              <select class="bg-dark-800 border border-dark-600 rounded-lg px-3 py-1.5 text-xs focus:border-primary-500 outline-none">
+              <select id="lb-dataset-select" class="bg-dark-800 border border-dark-600 rounded-lg px-3 py-1.5 text-xs focus:border-primary-500 outline-none">
                 <option>客戶流失預測 v3</option>
                 <option>銷售額預測 Q2</option>
                 <option>產品推薦引擎</option>
