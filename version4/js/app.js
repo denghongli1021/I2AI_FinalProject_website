@@ -143,13 +143,21 @@ function updatePageModeVisibility(page) {
     if (appMode === 'demo') {
       demoEl.classList.remove('hidden');
       realEmptyEl.classList.add('hidden');
+      // Hide real content for insights
+      const realContent = document.getElementById(`${p}-real-content`);
+      if (realContent) realContent.classList.add('hidden');
     } else {
       demoEl.classList.add('hidden');
-      realEmptyEl.classList.remove('hidden');
-      // For pages that can show real data when models exist
-      if ((p === 'leaderboard' || p === 'insights' || p === 'dashboard') && MLEngine.trainedModels.length > 0) {
+      const realContent = document.getElementById(`${p}-real-content`);
+      if ((p === 'leaderboard' || p === 'dashboard') && MLEngine.trainedModels.length > 0) {
         realEmptyEl.classList.add('hidden');
         demoEl.classList.remove('hidden');
+      } else if (p === 'insights' && MLEngine.trainedModels.length > 0) {
+        realEmptyEl.classList.add('hidden');
+        if (realContent) realContent.classList.remove('hidden');
+      } else {
+        realEmptyEl.classList.remove('hidden');
+        if (realContent) realContent.classList.add('hidden');
       }
     }
   });
@@ -263,8 +271,6 @@ function handleFile(file) {
 }
 
 function resetUploadZone() {
-  document.getElementById('upload-card').classList.remove('hidden');
-  document.getElementById('file-info-bar').classList.add('hidden');
   const zone = document.getElementById('upload-zone');
   zone.innerHTML = `
     <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -281,10 +287,64 @@ function resetUploadZone() {
     e.stopPropagation();
     document.getElementById('csv-file-input').click();
   });
-  DataEngine.currentDataset = null;
-  renderDatasetPage();
+  document.getElementById('upload-card').classList.remove('hidden');
+  document.getElementById('file-info-bar').classList.add('hidden');
 }
 window.resetUploadZone = resetUploadZone;
+
+// ===== DATASET LIST =====
+function renderDatasetList() {
+  const listBar = document.getElementById('dataset-list-bar');
+  const listEl = document.getElementById('dataset-list');
+  if (!listBar || !listEl) return;
+
+  if (DataEngine.datasets.length === 0) {
+    listBar.classList.add('hidden');
+    return;
+  }
+
+  listBar.classList.remove('hidden');
+  listEl.innerHTML = '';
+
+  DataEngine.datasets.forEach(ds => {
+    const isActive = DataEngine.currentDataset && DataEngine.currentDataset.id === ds.id;
+    const div = document.createElement('div');
+    div.className = `flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${isActive ? 'bg-primary-500/10 border-primary-500' : 'bg-dark-800 border-dark-600 hover:border-dark-500'}`;
+    div.innerHTML = `
+      <div class="w-8 h-8 rounded-lg ${isActive ? 'bg-primary-500/20' : 'bg-dark-700'} flex items-center justify-center flex-shrink-0">
+        <svg class="w-4 h-4 ${isActive ? 'text-primary-400' : 'text-dark-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium truncate ${isActive ? 'text-primary-300' : ''}">${escapeHtml(ds.fileName)}</p>
+        <p class="text-xs text-dark-400">${ds.rowCount.toLocaleString()} 筆 | ${ds.colCount} 欄位</p>
+      </div>
+      ${isActive ? '<span class="text-xs text-primary-400 font-medium flex-shrink-0">使用中</span>' : ''}
+      <button class="ds-remove-btn p-1 rounded hover:bg-dark-600 transition-colors flex-shrink-0" data-id="${ds.id}" title="移除">
+        <svg class="w-4 h-4 text-dark-500 hover:text-danger-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    `;
+    // Click to switch dataset
+    div.addEventListener('click', (e) => {
+      if (e.target.closest('.ds-remove-btn')) return;
+      DataEngine.switchDataset(ds.id);
+      renderDatasetPage();
+    });
+    // Remove button
+    div.querySelector('.ds-remove-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      DataEngine.removeDataset(ds.id);
+      renderDatasetPage();
+    });
+    listEl.appendChild(div);
+  });
+
+  // "Upload new" button
+  const btnUploadNew = document.getElementById('btn-upload-new');
+  btnUploadNew.onclick = () => {
+    document.getElementById('upload-card').classList.remove('hidden');
+    document.getElementById('csv-file-input').click();
+  };
+}
 
 // ===== RENDER DATASET PAGE (depending on mode) =====
 function renderDatasetPage() {
@@ -306,9 +366,11 @@ function renderDemoDataset() {
   const empty = document.getElementById('dataset-empty-state');
   const uploadCard = document.getElementById('upload-card');
   const infoBar = document.getElementById('file-info-bar');
+  const listBar = document.getElementById('dataset-list-bar');
 
-  // In demo mode: hide upload, show analysis with mock data
+  // In demo mode: hide upload and dataset list, show analysis with mock data
   uploadCard.classList.add('hidden');
+  if (listBar) listBar.classList.add('hidden');
   infoBar.classList.remove('hidden');
   analysis.classList.remove('hidden');
   empty.classList.add('hidden');
@@ -565,6 +627,8 @@ function renderRealDataset() {
   const empty = document.getElementById('dataset-empty-state');
   const uploadCard = document.getElementById('upload-card');
   const infoBar = document.getElementById('file-info-bar');
+  // Render dataset list if we have any
+  renderDatasetList();
 
   if (!DataEngine.currentDataset) {
     // No data uploaded yet: show upload zone
@@ -1820,6 +1884,23 @@ function renderRealLeaderboard() {
   if (models.length === 0) return;
 
   const isReg = models[0].taskType === 'regression';
+
+  // Update column headers
+  const col1 = document.getElementById('lb-col1');
+  const col2 = document.getElementById('lb-col2');
+  const col3 = document.getElementById('lb-col3');
+  if (col1 && col2 && col3) {
+    if (isReg) {
+      col1.innerHTML = 'R² <span class="sort-arrow">&#8597;</span>';
+      col2.innerHTML = 'RMSE <span class="sort-arrow">&#8597;</span>';
+      col3.innerHTML = 'MAE <span class="sort-arrow">&#8597;</span>';
+    } else {
+      col1.innerHTML = 'F1-Score <span class="sort-arrow">&#8597;</span>';
+      col2.innerHTML = 'AUC-ROC <span class="sort-arrow">&#8597;</span>';
+      col3.innerHTML = '準確率 <span class="sort-arrow">&#8597;</span>';
+    }
+  }
+
   const tbody = document.getElementById('leaderboard-body');
   if (!tbody) return;
   tbody.innerHTML = '';
@@ -1834,18 +1915,17 @@ function renderRealLeaderboard() {
         ? '<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-dark-600 text-dark-200 text-xs font-bold">2</span>'
         : `<span class="text-dark-400 text-sm">${i + 1}</span>`;
 
-    let scoreVal, extraCols;
+    let extraCols;
     if (isReg) {
-      scoreVal = m.metrics.testR2.toFixed(4);
       extraCols = `
-        <td class="py-3 px-4 font-mono text-xs">—</td>
-        <td class="py-3 px-4 font-mono text-xs">${m.metrics.testR2.toFixed(4)}</td>`;
+        <td class="py-3 px-4 font-mono text-xs">${m.metrics.testR2.toFixed(4)}</td>
+        <td class="py-3 px-4 font-mono text-xs">${m.metrics.testRMSE.toFixed(4)}</td>
+        <td class="py-3 px-4 font-mono text-xs">${m.metrics.testMAE.toFixed(4)}</td>`;
     } else {
-      scoreVal = (m.metrics.testAccuracy * 100).toFixed(2) + '%';
       extraCols = `
         <td class="py-3 px-4 font-mono text-xs">${m.metrics.f1.toFixed(4)}</td>
         <td class="py-3 px-4 font-mono text-xs">—</td>
-        <td class="py-3 px-4 font-mono text-xs">${scoreVal}</td>`;
+        <td class="py-3 px-4 font-mono text-xs">${(m.metrics.testAccuracy * 100).toFixed(2)}%</td>`;
     }
 
     const badge = i === 0 ? '<span class="badge badge-success">最佳</span>' : '';
@@ -1870,13 +1950,29 @@ function renderRealInsights() {
   if (models.length === 0) return;
 
   const best = models[0];
+  const isReg = best.taskType === 'regression';
 
-  // Feature importance
-  renderFeatureImportanceReal(best);
+  // Summary cards
+  document.getElementById('insight-best-model').textContent = best.name;
+  document.getElementById('insight-score-label').textContent = isReg ? 'R² 分數' : '準確率';
+  document.getElementById('insight-best-score').textContent = isReg
+    ? best.metrics.testR2.toFixed(4)
+    : (best.metrics.testAccuracy * 100).toFixed(2) + '%';
+  document.getElementById('insight-feature-count').textContent = best.featureNames.length;
+  document.getElementById('insight-model-count').textContent = models.length;
+
+  // Feature importance chart
+  renderRealFeatureImportance(best);
+  // Model comparison chart
+  renderRealModelCompare(models, isReg);
+  // Prediction scatter
+  renderRealPredScatter(best, isReg);
+  // Residuals
+  if (isReg) renderRealResiduals(best);
 }
 
-function renderFeatureImportanceReal(model) {
-  const chart = initChart('chart-feature-importance');
+function renderRealFeatureImportance(model) {
+  const chart = initChart('chart-real-feature-importance');
   if (!chart) return;
 
   const names = model.featureNames;
@@ -1903,15 +1999,106 @@ function renderFeatureImportanceReal(model) {
   });
 }
 
+function renderRealModelCompare(models, isReg) {
+  const chart = initChart('chart-real-model-compare');
+  if (!chart) return;
+
+  const names = models.map(m => m.name);
+  const scores = models.map(m => isReg ? m.metrics.testR2 : m.metrics.testScore);
+  const colors = scores.map(s => s > 0.8 ? '#10b981' : s > 0.5 ? '#f59e0b' : s > 0 ? '#f87171' : '#64748b');
+
+  chart.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0', fontSize: 11 } },
+    grid: { left: 30, right: 20, top: 10, bottom: 80 },
+    xAxis: { type: 'category', data: names, axisLabel: { color: '#94a3b8', fontSize: 9, rotate: 35, interval: 0 }, axisLine: { lineStyle: { color: '#1e293b' } } },
+    yAxis: { type: 'value', name: isReg ? 'R²' : 'Score', nameTextStyle: { color: '#64748b', fontSize: 10 }, axisLabel: { color: '#64748b', fontSize: 9 }, splitLine: { lineStyle: { color: '#1e293b' } } },
+    series: [{
+      type: 'bar', data: scores.map((s, i) => ({ value: s, itemStyle: { color: colors[i] } })),
+      barWidth: '50%',
+      itemStyle: { borderRadius: [4, 4, 0, 0] },
+      label: { show: true, position: 'top', color: '#e2e8f0', fontSize: 9, formatter: p => p.value.toFixed(4) },
+    }],
+  });
+}
+
+function renderRealPredScatter(model, isReg) {
+  const chart = initChart('chart-real-pred-scatter');
+  if (!chart) return;
+
+  if (!isReg) {
+    // Classification: show confusion-like accuracy per class
+    chart.setOption({
+      title: { text: '（分類模式 - 請參考排行榜）', left: 'center', top: 'center', textStyle: { color: '#64748b', fontSize: 13 } },
+    });
+    return;
+  }
+
+  const trueVals = model.testTrue;
+  const predVals = model.testPred;
+  const data = trueVals.map((t, i) => [t, predVals[i]]);
+  const allVals = [...trueVals, ...predVals];
+  const mn = Math.min(...allVals);
+  const mx = Math.max(...allVals);
+
+  chart.setOption({
+    tooltip: { trigger: 'item', backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0', fontSize: 11 }, formatter: p => `實際: ${p.value[0].toFixed(2)}<br>預測: ${p.value[1].toFixed(2)}` },
+    grid: { left: 50, right: 20, top: 15, bottom: 40 },
+    xAxis: { type: 'value', name: '實際值', nameTextStyle: { color: '#64748b', fontSize: 10 }, axisLabel: { color: '#64748b', fontSize: 9 }, splitLine: { lineStyle: { color: '#1e293b' } } },
+    yAxis: { type: 'value', name: '預測值', nameTextStyle: { color: '#64748b', fontSize: 10 }, axisLabel: { color: '#64748b', fontSize: 9 }, splitLine: { lineStyle: { color: '#1e293b' } } },
+    series: [
+      { type: 'scatter', data, symbolSize: 6, itemStyle: { color: '#22d3ee', opacity: 0.6 } },
+      { type: 'line', data: [[mn, mn], [mx, mx]], lineStyle: { color: '#f59e0b', type: 'dashed', width: 1.5 }, symbol: 'none', tooltip: { show: false } },
+    ],
+  });
+}
+
+function renderRealResiduals(model) {
+  const chart = initChart('chart-real-residuals');
+  if (!chart) return;
+
+  const residuals = model.testTrue.map((t, i) => t - model.testPred[i]);
+  // Histogram
+  const binCount = 20;
+  const mn = Math.min(...residuals);
+  const mx = Math.max(...residuals);
+  const binWidth = (mx - mn) / binCount || 1;
+  const bins = new Array(binCount).fill(0);
+  const binLabels = [];
+  for (let i = 0; i < binCount; i++) {
+    binLabels.push((mn + (i + 0.5) * binWidth).toFixed(1));
+  }
+  residuals.forEach(r => {
+    const idx = Math.min(Math.floor((r - mn) / binWidth), binCount - 1);
+    bins[idx]++;
+  });
+
+  chart.setOption({
+    tooltip: { trigger: 'axis', backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0', fontSize: 11 } },
+    grid: { left: 40, right: 20, top: 15, bottom: 35 },
+    xAxis: { type: 'category', data: binLabels, name: '殘差', nameTextStyle: { color: '#64748b', fontSize: 10 }, axisLabel: { color: '#64748b', fontSize: 8, rotate: 30 }, axisLine: { lineStyle: { color: '#1e293b' } } },
+    yAxis: { type: 'value', name: '頻次', nameTextStyle: { color: '#64748b', fontSize: 10 }, axisLabel: { color: '#64748b', fontSize: 9 }, splitLine: { lineStyle: { color: '#1e293b' } } },
+    series: [{
+      type: 'bar', data: bins,
+      itemStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: '#22d3ee' },
+          { offset: 1, color: '#3b82f6' }
+        ]),
+        borderRadius: [3, 3, 0, 0],
+      },
+      barWidth: '80%',
+    }],
+  });
+}
+
 // ===== DASHBOARD REAL METRICS =====
 function updateDashboardRealMetrics() {
   const models = MLEngine.trainedModels;
-  const ds = DataEngine.currentDataset;
   // Update the 4 metric cards (they're the first metric-card elements in the dashboard)
   const cards = document.querySelectorAll('#page-dashboard .metric-card');
   if (cards.length >= 4) {
     // Active datasets
-    cards[0].querySelector('.text-3xl').textContent = ds ? '1' : '0';
+    cards[0].querySelector('.text-3xl').textContent = DataEngine.datasets.length.toString();
     // Completed experiments
     cards[1].querySelector('.text-3xl').textContent = models.length.toString();
     // Best model score

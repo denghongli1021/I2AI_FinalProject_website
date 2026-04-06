@@ -269,6 +269,18 @@
         <!-- Hidden file input -->
         <input type="file" id="csv-file-input" accept=".csv,.tsv,.txt" class="hidden">
 
+        <!-- Dataset List (shown when datasets exist) -->
+        <div id="dataset-list-bar" class="card mb-6 hidden">
+          <div class="card-header">
+            <h3 class="card-title">已載入的數據集</h3>
+            <button id="btn-upload-new" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-500 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              上傳新數據集
+            </button>
+          </div>
+          <div id="dataset-list" class="px-4 pb-4 space-y-2"></div>
+        </div>
+
         <!-- Upload Area -->
         <div id="upload-card" class="card mb-6">
           <div id="upload-zone" class="border-2 border-dashed border-dark-600 rounded-xl p-10 text-center hover:border-primary-500/50 transition-all cursor-pointer group">
@@ -498,7 +510,68 @@
           <p class="text-sm">上傳 CSV 檔案以開始分析數據</p>
         </div>
       </section>
-
+      
+      <section id="page-insights" class="page-section hidden">
+        <div class="mb-6 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold">洞察與決策</h2>
+            <p class="text-sm text-dark-400 mt-1">檢視模型的特徵重要性與關鍵效能指標</p>
+          </div>
+          <select id="insight-model-select"
+            class="bg-dark-800 border border-dark-600 rounded-lg px-4 py-2 text-sm focus:border-primary-500 outline-none">
+            <option value="best">最佳模型 (自動選擇)</option>
+          </select>
+        </div>
+      
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="card p-4 flex items-center gap-4 border-l-4 border-success-500">
+            <div class="w-12 h-12 rounded-full bg-success-500/10 flex items-center justify-center text-success-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-dark-400">模型準確率 (Accuracy / R²)</p>
+              <h3 class="text-2xl font-bold mt-1" id="insight-accuracy-value">-- %</h3>
+            </div>
+          </div>
+      
+          <div class="card p-4 flex items-center gap-4 border-l-4 border-warning-500">
+            <div class="w-12 h-12 rounded-full bg-warning-500/10 flex items-center justify-center text-warning-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-dark-400">訓練耗時 (Time)</p>
+              <h3 class="text-2xl font-bold mt-1" id="insight-time-value">-- ms</h3>
+            </div>
+          </div>
+      
+          <div class="card p-4 flex items-center gap-4 border-l-4 border-primary-500">
+            <div class="w-12 h-12 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-dark-400">使用特徵數量</p>
+              <h3 class="text-2xl font-bold mt-1" id="insight-feature-count">--</h3>
+            </div>
+          </div>
+        </div>
+      
+        <div class="card mb-6">
+          <div class="card-header">
+            <h3 class="card-title">特徵重要性 (Feature Importance)</h3>
+          </div>
+          <div id="chart-feature-importance" class="h-80"></div>
+        </div>
+      </section>
+      
       <!-- ===== PAGE: EXPERIMENTS ===== -->
       <section id="page-experiments" class="page-section hidden">
         <!-- Real mode experiment UI -->
@@ -547,11 +620,10 @@
                 <div>
                   <label class="block text-sm font-medium text-dark-300 mb-2">資料集類型</label>
                   <label class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-dark-800 border border-dark-600 cursor-pointer hover:border-primary-500 transition-colors">
-                    <div class="relative">
-                      <input type="checkbox" id="exp-time-series" class="sr-only peer">
-                      <div class="w-9 h-5 bg-dark-600 rounded-full peer-checked:bg-primary-500 transition-colors"></div>
-                      <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
-                    </div>
+                    <label class="toggle-switch" style="flex-shrink:0">
+                      <input type="checkbox" id="exp-time-series">
+                      <span class="toggle-slider"></span>
+                    </label>
                     <div>
                       <p class="text-sm font-medium">時間序列 (Time Series)</p>
                       <p class="text-xs text-dark-400">啟用後將依時間順序切分訓練/測試集</p>
@@ -915,6 +987,80 @@
             <h3 class="text-lg font-semibold mb-2">尚無模型洞察</h3>
             <p class="text-sm text-dark-400 mb-4">訓練完成後，系統將自動產生特徵重要性、SHAP 分析等洞察</p>
             <button onclick="navigateTo('experiments')" class="px-4 py-2 bg-primary-600 hover:bg-primary-500 rounded-lg text-sm font-medium transition-colors">前往建立實驗</button>
+          </div>
+        </div>
+        <!-- Real insights content (shown after training) -->
+        <div id="insights-real-content" class="hidden">
+          <!-- Summary cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="card p-4 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm text-dark-400">最佳模型</p>
+                <h3 class="text-lg font-bold" id="insight-best-model">--</h3>
+              </div>
+            </div>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-success-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-success-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm text-dark-400" id="insight-score-label">最佳分數</p>
+                <h3 class="text-lg font-bold" id="insight-best-score">--</h3>
+              </div>
+            </div>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-accent-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+              </div>
+              <div>
+                <p class="text-sm text-dark-400">使用特徵數量</p>
+                <h3 class="text-lg font-bold" id="insight-feature-count">--</h3>
+              </div>
+            </div>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-warning-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-warning-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm text-dark-400">已訓練模型</p>
+                <h3 class="text-lg font-bold" id="insight-model-count">--</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature Importance + Model Comparison -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">特徵重要性 (Feature Importance)</h3>
+              </div>
+              <div id="chart-real-feature-importance" class="h-80"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">模型分數比較</h3>
+              </div>
+              <div id="chart-real-model-compare" class="h-80"></div>
+            </div>
+          </div>
+
+          <!-- Prediction Scatter / Residuals -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">預測 vs 實際</h3>
+              </div>
+              <div id="chart-real-pred-scatter" class="h-72"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">殘差分佈</h3>
+              </div>
+              <div id="chart-real-residuals" class="h-72"></div>
+            </div>
           </div>
         </div>
         <div id="insights-demo-content">

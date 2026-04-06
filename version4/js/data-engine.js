@@ -3,6 +3,8 @@
 const DataEngine = {
   // Current dataset state
   currentDataset: null,
+  // All loaded datasets
+  datasets: [],
 
   // ---- CSV PARSER ----
   parseCSV(text, delimiter) {
@@ -78,7 +80,8 @@ const DataEngine = {
 
     const analysis = this.analyzeColumns(headers, columns, data);
 
-    this.currentDataset = {
+    const dataset = {
+      id: Date.now(),
       fileName,
       headers,
       data,
@@ -89,7 +92,31 @@ const DataEngine = {
       loadedAt: new Date(),
     };
 
+    // Check if same fileName already exists; replace it
+    const existIdx = this.datasets.findIndex(d => d.fileName === fileName);
+    if (existIdx >= 0) {
+      this.datasets[existIdx] = dataset;
+    } else {
+      this.datasets.push(dataset);
+    }
+
+    this.currentDataset = dataset;
     return this.currentDataset;
+  },
+
+  // Switch to a dataset by id
+  switchDataset(id) {
+    const ds = this.datasets.find(d => d.id === id);
+    if (ds) this.currentDataset = ds;
+    return this.currentDataset;
+  },
+
+  // Remove a dataset by id
+  removeDataset(id) {
+    this.datasets = this.datasets.filter(d => d.id !== id);
+    if (this.currentDataset && this.currentDataset.id === id) {
+      this.currentDataset = this.datasets.length > 0 ? this.datasets[this.datasets.length - 1] : null;
+    }
   },
 
   // ---- COLUMN ANALYSIS ----
