@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能預測與決策支援平台 - AI Decision Support</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-brain"></i>
+                <span>AI Decision Hub</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <button class="nav-item active" data-module="overview">
+                    <i class="fas fa-chart-line"></i> 概覽
+                </button>
+                <button class="nav-item" data-module="data-hub">
+                    <i class="fas fa-database"></i> 資料中樞
+                </button>
+                <button class="nav-item" data-module="automl">
+                    <i class="fas fa-flask"></i> AutoML 實驗室
+                </button>
+                <button class="nav-item" data-module="xai">
+                    <i class="fas fa-lightbulb"></i> 可解釋性
+                </button>
+                <button class="nav-item" data-module="decision">
+                    <i class="fas fa-chess"></i> 決策支援
+                </button>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        
+        <!-- 模塊 0: 概覽儀表板 -->
+        <section class="module" id="overview-module" data-module="overview">
+            <div class="module-header">
+                <h1>智能預測與決策支援平台</h1>
+                <p>一站式 AutoML 與可解釋性 AI 解決方案</p>
+            </div>
+            
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <div class="card-icon"><i class="fas fa-upload"></i></div>
+                    <h3>資料中樞</h3>
+                    <p>上傳 CSV/Excel 或連結資料庫，自動進行資料探索與清洗</p>
+                    <button class="btn btn-primary" onclick="switchModule('data-hub')">進入</button>
+                </div>
+                
+                <div class="overview-card">
+                    <div class="card-icon"><i class="fas fa-robot"></i></div>
+                    <h3>AutoML 實驗室</h3>
+                    <p>向導與專家双模式，自動進行特徵工程與超參數優化</p>
+                    <button class="btn btn-primary" onclick="switchModule('automl')">進入</button>
+                </div>
+                
+                <div class="overview-card">
+                    <div class="card-icon"><i class="fas fa-glasses"></i></div>
+                    <h3>XAI 可解釋性</h3>
+                    <p>SHAP 值、瀑布圖、特徵重要性、局部解釋</p>
+                    <button class="btn btn-primary" onclick="switchModule('xai')">進入</button>
+                </div>
+                
+                <div class="overview-card">
+                    <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                    <h3>決策支援</h3>
+                    <p>What-If 模擬、行動建議、風險預警清單</p>
+                    <button class="btn btn-primary" onclick="switchModule('decision')">進入</button>
+                </div>
+            </div>
+
+            <!-- 系統狀態 -->
+            <div class="system-status">
+                <h3>系統狀態</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">後端狀態</span>
+                        <span class="status-badge online">線上</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">資料庫</span>
+                        <span class="status-badge online">就緒</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">訓練任務</span>
+                        <span class="status-badge">0 個執行中</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">GPU 使用率</span>
+                        <span class="status-value">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模塊 1: 資料中樞 -->
+        <section class="module hidden" id="data-hub-module" data-module="data-hub">
+            <div class="module-header">
+                <h1>資料中樞</h1>
+                <p>上傳、預覽、探索您的數據</p>
+            </div>
+
+            <div class="module-content">
+                <!-- 上传区域 -->
+                <div class="upload-area">
+                    <div class="upload-zone" id="uploadZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>拖放檔案或點擊選擇</h3>
+                        <p>支持 CSV、Excel、JSON 格式</p>
+                        <input type="file" id="fileInput" style="display:none" multiple>
+                    </div>
+                    <div class="upload-options">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-database"></i> 連結資料庫
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-api"></i> 連結 API
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 資料預覽 -->
+                <div class="data-preview-section">
+                    <h3>資料預覽</h3>
+                    <div class="data-info-tabs">
+                        <button class="tab-btn active">概覽</button>
+                        <button class="tab-btn">統計資訊</button>
+                        <button class="tab-btn">缺失值分析</button>
+                        <button class="tab-btn">時間序列</button>
+                    </div>
+
+                    <div class="data-grid">
+                        <table id="dataTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>特徵 A</th>
+                                    <th>特徵 B</th>
+                                    <th>特徵 C</th>
+                                    <th>目標值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>42.5</td>
+                                    <td>類別 A</td>
+                                    <td>2024-01-15</td>
+                                    <td>0.95</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>38.2</td>
+                                    <td>類別 B</td>
+                                    <td>2024-01-16</td>
+                                    <td>0.72</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>45.1</td>
+                                    <td>類別 A</td>
+                                    <td>2024-01-17</td>
+                                    <td>0.88</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="data-stats">
+                        <div class="stat-box">
+                            <span class="stat-label">總行數</span>
+                            <span class="stat-value">10,000</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">列數</span>
+                            <span class="stat-value">15</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">數值特徵</span>
+                            <span class="stat-value">8</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">類別特徵</span>
+                            <span class="stat-value">5</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">缺失值率</span>
+                            <span class="stat-value">2.3%</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">時間跨度</span>
+                            <span class="stat-value">365 天</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 資料配置 -->
+                <div class="data-config-section">
+                    <h3>資料配置</h3>
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label>目標變數</label>
+                            <select>
+                                <option>選擇目標欄位...</option>
+                                <option>營收</option>
+                                <option>客戶流失</option>
+                                <option>預測需求</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>時間欄位 (可選)</label>
+                            <select>
+                                <option>選擇時間欄位...</option>
+                                <option>日期</option>
+                                <option>時間戳記</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>測試集比例</label>
+                            <input type="range" min="0.1" max="0.5" step="0.05" value="0.2">
+                            <span>20%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模塊 2: AutoML 實驗室 -->
+        <section class="module hidden" id="automl-module" data-module="automl">
+            <div class="module-header">
+                <h1>AutoML 實驗室</h1>
+                <p>自動化機器學習實驗與模型優化</p>
+            </div>
+
+            <div class="module-content">
+                <!-- 模式選擇 -->
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="wizard">
+                        <i class="fas fa-magic"></i> 向導模式 (簡單)
+                    </button>
+                    <button class="mode-btn" data-mode="expert">
+                        <i class="fas fa-sliders-h"></i> 專家模式 (進階)
+                    </button>
+                </div>
+
+                <!-- 向導模式 -->
+                <div class="mode-panel active" id="wizard-mode">
+                    <div class="wizard-steps">
+                        <div class="wizard-step active">
+                            <h3>第 1 步：定義目標</h3>
+                            <div class="form-group">
+                                <label>任務類型</label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="task" value="classification" checked> 分類</label>
+                                    <label><input type="radio" name="task" value="regression"> 回歸</label>
+                                    <label><input type="radio" name="task" value="timeseries"> 時間序列</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>優化指標</label>
+                                <select>
+                                    <option>準確率 (Accuracy)</option>
+                                    <option>F1 Score</option>
+                                    <option>AUC-ROC</option>
+                                    <option>MAE</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="wizard-step">
+                            <h3>第 2 步：時間限制</h3>
+                            <div class="form-group">
+                                <label>訓練時間 (分鐘)</label>
+                                <input type="number" min="5" max="480" value="60" placeholder="輸入時間">
+                            </div>
+                            <div class="form-group">
+                                <label>優先級</label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="priority" value="speed"> 速度優先</label>
+                                    <label><input type="radio" name="priority" value="balanced" checked> 平衡</label>
+                                    <label><input type="radio" name="priority" value="quality"> 品質優先</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="wizard-step">
+                            <h3>第 3 步：確認開始</h3>
+                            <div class="summary-box">
+                                <p>系統將自動選擇最適合的演算法</p>
+                                <p>包含 XGBoost, LightGBM, CatBoost, Neural Networks</p>
+                            </div>
+                            <button class="btn btn-primary btn-large" onclick="startAutoML()">
+                                <i class="fas fa-play"></i> 開始 AutoML 訓練
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 專家模式 -->
+                <div class="mode-panel hidden" id="expert-mode">
+                    <h3>演算法選擇</h3>
+                    <div class="algorithm-grid">
+                        <label class="algo-checkbox">
+                            <input type="checkbox" value="xgboost" checked>
+                            <span class="algo-name">XGBoost</span>
+                            <span class="algo-desc">極度優化的梯度提升</span>
+                        </label>
+                        <label class="algo-checkbox">
+                            <input type="checkbox" value="lightgbm" checked>
+                            <span class="algo-name">LightGBM</span>
+                            <span class="algo-desc">輕量級漸進式樹學習</span>
+                        </label>
+                        <label class="algo-checkbox">
+                            <input type="checkbox" value="randomforest" checked>
+                            <span class="algo-name">Random Forest</span>
+                            <span class="algo-desc">隨機樹集成</span>
+                        </label>
+                        <label class="algo-checkbox">
+                            <input type="checkbox" value="svm">
+                            <span class="algo-name">SVM</span>
+                            <span class="algo-desc">支持向量機</span>
+                        </label>
+                        <label class="algo-checkbox">
+                            <input type="checkbox" value="neural">
+                            <span class="algo-name">Neural Network</span>
+                            <span class="algo-desc">深度神經網絡</span>
+                        </label>
+                        <label class="algo-checkbox">
+                            <input type="checkbox" value="lstm">
+                            <span class="algo-name">LSTM</span>
+                            <span class="algo-desc">長短期記憶網絡 (時間序列)</span>
+                        </label>
+                    </div>
+
+                    <h3>超參數搜索空間</h3>
+                    <div class="param-config">
+                        <div class="param-item">
+                            <label>學習率範圍</label>
+                            <input type="range" min="0.001" max="0.3" step="0.001">
+                            <span>0.001 - 0.3</span>
+                        </div>
+                        <div class="param-item">
+                            <label>樹深度範圍</label>
+                            <input type="range" min="3" max="15" step="1">
+                            <span>3 - 15</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-large">開始專家訓練</button>
+                </div>
+
+                <!-- 訓練進度 -->
+                <div class="training-progress hidden" id="trainingProgress">
+                    <h3>即時訓練進度</h3>
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <span>模型競技場排行榜</span>
+                            <span class="elapsed-time">已執行: 12分 34秒</span>
+                        </div>
+                        <div class="leaderboard">
+                            <div class="leaderboard-row hero">
+                                <span class="rank">🥇</span>
+                                <span class="model-name">XGBoost v3</span>
+                                <span class="metric">準確率: 94.7%</span>
+                                <span class="status">✓ 完成</span>
+                            </div>
+                            <div class="leaderboard-row">
+                                <span class="rank">🥈</span>
+                                <span class="model-name">LightGBM v2</span>
+                                <span class="metric">準確率: 93.2%</span>
+                                <span class="status">✓ 完成</span>
+                            </div>
+                            <div class="leaderboard-row">
+                                <span class="rank">🥉</span>
+                                <span class="model-name">CatBoost</span>
+                                <span class="metric">準確率: 92.1%</span>
+                                <span class="status">訓練中... 第 45/100 epoch</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hyperopt-chart">
+                        <h4>超參數優化歷程</h4>
+                        <canvas id="hyperoptChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模塊 3: XAI 可解釋性 -->
+        <section class="module hidden" id="xai-module" data-module="xai">
+            <div class="module-header">
+                <h1>XAI 可解釋性儀表板</h1>
+                <p>理解模型決策背後的邏輯</p>
+            </div>
+
+            <div class="module-content">
+                <div class="xai-layout">
+                    <!-- 全局解釋 -->
+                    <div class="xai-section">
+                        <h3>全局特徵重要性 (SHAP)</h3>
+                        <canvas id="shap-chart" height="400"></canvas>
+                        <p class="chart-desc">展示所有特徵對模型預測的平均影響力</p>
+                    </div>
+
+                    <!-- 局部解釋 -->
+                    <div class="xai-section">
+                        <h3>單筆預測解釋 (瀑布圖)</h3>
+                        <div class="sample-selector">
+                            <label>選擇樣本</label>
+                            <select id="sampleSelect">
+                                <option>樣本 #1: 客戶 A (風險: 高)</option>
+                                <option>樣本 #2: 客戶 B (風險: 低)</option>
+                                <option>樣本 #3: 客戶 C (風險: 中)</option>
+                            </select>
+                        </div>
+                        <div id="waterfallExplanation" class="waterfall-container">
+                            <div class="waterfall-item">
+                                <span class="item-label">基準預測</span>
+                                <span class="item-value">65%</span>
+                            </div>
+                            <div class="waterfall-item positive">
+                                <span class="item-label">+ 消費金額高</span>
+                                <span class="item-value">+15%</span>
+                            </div>
+                            <div class="waterfall-item negative">
+                                <span class="item-label">- 帳戶年資低</span>
+                                <span class="item-value">-10%</span>
+                            </div>
+                            <div class="waterfall-item positive">
+                                <span class="item-label">+ 購買頻度高</span>
+                                <span class="item-value">+8%</span>
+                            </div>
+                            <div class="waterfall-item final">
+                                <span class="item-label">最終預測</span>
+                                <span class="item-value">78%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 部分依賴圖 -->
+                    <div class="xai-section">
+                        <h3>部分依賴圖 (PDP)</h3>
+                        <div class="pdp-selector">
+                            <label>選擇特徵</label>
+                            <select>
+                                <option>特徵: 消費金額</option>
+                                <option>特徵: 帳戶年資</option>
+                                <option>特徵: 購買頻度</option>
+                            </select>
+                        </div>
+                        <canvas id="pdpChart" height="300"></canvas>
+                    </div>
+
+                    <!-- 累積本地說明近似 (LIME) -->
+                    <div class="xai-section">
+                        <h3>本地解釋 (LIME)</h3>
+                        <div class="lime-explanation">
+                            <p class="lime-desc">針對客戶 #1 的本地決策邊界說明</p>
+                            <div class="lime-factors">
+                                <div class="lime-factor positive">
+                                    <span class="factor-name">消費等級</span>
+                                    <div class="factor-bar" style="width: 85%"></div>
+                                    <span class="factor-impact">+25%</span>
+                                </div>
+                                <div class="lime-factor positive">
+                                    <span class="factor-name">年齡範圍</span>
+                                    <div class="factor-bar" style="width: 60%"></div>
+                                    <span class="factor-impact">+18%</span>
+                                </div>
+                                <div class="lime-factor negative">
+                                    <span class="factor-name">帳戶年資</span>
+                                    <div class="factor-bar" style="width: 35%"></div>
+                                    <span class="factor-impact">-12%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模塊 4: 決策支援 -->
+        <section class="module hidden" id="decision-module" data-module="decision">
+            <div class="module-header">
+                <h1>決策支援與 What-If 分析</h1>
+                <p>模擬決策方案，優化業務策略</p>
+            </div>
+
+            <div class="module-content">
+                <div class="decision-layout">
+                    <!-- What-If 模擬器 -->
+                    <div class="decision-section">
+                        <h3>互動式 What-If 模擬器</h3>
+                        <div class="simulator-controls">
+                            <div class="slider-group">
+                                <label>行銷預算 (調整 %)</label>
+                                <input type="range" min="-50" max="50" value="0" class="simulator-slider">
+                                <span class="slider-value">0%</span>
+                            </div>
+                            <div class="slider-group">
+                                <label>產品單價 (調整 %)</label>
+                                <input type="range" min="-30" max="30" value="0" class="simulator-slider">
+                                <span class="slider-value">0%</span>
+                            </div>
+                            <div class="slider-group">
+                                <label>客服品質評分</label>
+                                <input type="range" min="1" max="10" value="5" class="simulator-slider">
+                                <span class="slider-value">5/10</span>
+                            </div>
+                            <div class="slider-group">
+                                <label>促銷折扣 (%)</label>
+                                <input type="range" min="0" max="50" value="0" class="simulator-slider">
+                                <span class="slider-value">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="simulation-results">
+                            <div class="result-box">
+                                <span class="result-label">預測營收增長</span>
+                                <span class="result-value positive">+23.5%</span>
+                            </div>
+                            <div class="result-box">
+                                <span class="result-label">客戶滿意度</span>
+                                <span class="result-value positive">8.2/10</span>
+                            </div>
+                            <div class="result-box">
+                                <span class="result-label">客戶流失率</span>
+                                <span class="result-value">3.2%</span>
+                            </div>
+                            <div class="result-box">
+                                <span class="result-label">投資回報率</span>
+                                <span class="result-value positive">320%</span>
+                            </div>
+                        </div>
+
+                        <canvas id="whatIfChart" height="250"></canvas>
+                    </div>
+
+                    <!-- 風險預警清單 -->
+                    <div class="decision-section">
+                        <h3>風險預警清單</h3>
+                        <div class="alert-filters">
+                            <button class="filter-btn active">全部 (127)</button>
+                            <button class="filter-btn">🔴 高風險 (18)</button>
+                            <button class="filter-btn">🟡 中風險 (34)</button>
+                            <button class="filter-btn">🟢 低風險 (75)</button>
+                        </div>
+
+                        <div class="risk-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>客戶 ID</th>
+                                        <th>風險等級</th>
+                                        <th>流失機率</th>
+                                        <th>建議行動</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="risk-high">
+                                        <td>CUS-0001</td>
+                                        <td><span class="risk-badge high">🔴 高風險</span></td>
+                                        <td>87%</td>
+                                        <td><span class="action-badge">緊急挽留電話</span></td>
+                                    </tr>
+                                    <tr class="risk-high">
+                                        <td>CUS-0015</td>
+                                        <td><span class="risk-badge high">🔴 高風險</span></td>
+                                        <td>82%</td>
+                                        <td><span class="action-badge">VIP 客戶服務</span></td>
+                                    </tr>
+                                    <tr class="risk-medium">
+                                        <td>CUS-0042</td>
+                                        <td><span class="risk-badge medium">🟡 中風險</span></td>
+                                        <td>58%</td>
+                                        <td><span class="action-badge">優惠券方案</span></td>
+                                    </tr>
+                                    <tr class="risk-low">
+                                        <td>CUS-0103</td>
+                                        <td><span class="risk-badge low">🟢 低風險</span></td>
+                                        <td>15%</td>
+                                        <td><span class="action-badge">交叉銷售建議</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download"></i> 匯出風險清單 (Excel)
+                        </button>
+                    </div>
+
+                    <!-- 策略建議 -->
+                    <div class="decision-section">
+                        <h3>AI 策略建議</h3>
+                        <div class="strategy-cards">
+                            <div class="strategy-card">
+                                <h4>客戶分群策略</h4>
+                                <p>根據行為相似性，將客戶分為 5 個細分群體。針對高價值客戶進行差異化服務。</p>
+                                <span class="impact">預期效果: +12% 客戶保留率</span>
+                            </div>
+                            <div class="strategy-card">
+                                <h4>個性化推薦</h4>
+                                <p>採用協同過濾 + 內容推薦，為每位客戶產生動態個性化建議清單。</p>
+                                <span class="impact">預期效果: +8.5% 交叉銷售</span>
+                            </div>
+                            <div class="strategy-card">
+                                <h4>動態定價策略</h4>
+                                <p>根據需求預測與競爭對手定價，動態調整商品價格以最大化利潤。</p>
+                                <span class="impact">預期效果: +15% 毛利</span>
+                            </div>
+                            <div class="strategy-card">
+                                <h4>庫存最適化</h4>
+                                <p>基於時間序列預測，自動調整庫存水準，減少積壓與缺貨成本。</p>
+                                <span class="impact">預期效果: -20% 庫存成本</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 全局進度對話框 -->
+    <div class="modal hidden" id="progressModal">
+        <div class="modal-content">
+            <h3>AutoML 訓練進行中...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p id="progressText">初始化系統...</p>
+            <div class="progress-details" id="progressDetails"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 智能預測與決策支援平台. 基於 AutoML + XAI 技術.</p>
+            <div class="footer-links">
+                <a href="#">文檔</a> | <a href="#">API</a> | <a href="#">聯繫我們</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

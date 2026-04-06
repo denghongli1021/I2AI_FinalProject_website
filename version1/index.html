@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoML Pro - 全方位端對端自動機器學習平台</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="nav-logo">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <span>AutoML <span class="logo-accent">Pro</span></span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#hero" class="active">首頁</a></li>
+                <li><a href="#pipeline">系統架構</a></li>
+                <li><a href="#features">功能特色</a></li>
+                <li><a href="#dashboard">互動展示</a></li>
+                <li><a href="#models">技術核心</a></li>
+                <li><a href="#about">關於平台</a></li>
+            </ul>
+            <button class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <div class="particles" id="particles"></div>
+            <div class="grid-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-rocket"></i> 新一代 AutoML 解決方案
+            </div>
+            <h1 class="hero-title">
+                <span class="gradient-text">智慧驅動</span>
+                <br>端對端自動機器學習平台
+            </h1>
+            <p class="hero-subtitle">
+                從原始資料到商業決策，一站式自動完成數據清洗、特徵工程、模型訓練與超參數優化。
+                <br>讓 AI 為您的數據釋放最大價值。
+            </p>
+            <div class="hero-buttons">
+                <a href="#dashboard" class="btn btn-primary">
+                    <i class="fas fa-play"></i> 開始體驗
+                </a>
+                <a href="#pipeline" class="btn btn-secondary">
+                    <i class="fas fa-info-circle"></i> 了解更多
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="99.2">0</div>
+                    <div class="stat-suffix">%</div>
+                    <div class="stat-label">最高準確率</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-suffix">x</div>
+                    <div class="stat-label">效率提升</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="6">0</div>
+                    <div class="stat-suffix">+</div>
+                    <div class="stat-label">核心演算法</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="100">0</div>
+                    <div class="stat-suffix">%</div>
+                    <div class="stat-label">全自動化</div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <span>向下捲動探索更多</span>
+        </div>
+    </section>
+
+    <!-- Pipeline Section -->
+    <section class="section pipeline-section" id="pipeline">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">SYSTEM ARCHITECTURE</span>
+                <h2 class="section-title">端對端 <span class="gradient-text">自動化流程</span></h2>
+                <p class="section-desc">從數據輸入到決策輸出，每一步都經過精心優化的智慧流水線</p>
+            </div>
+            <div class="pipeline-flow">
+                <div class="pipeline-step" data-step="1">
+                    <div class="step-icon"><i class="fas fa-database"></i></div>
+                    <div class="step-content">
+                        <h3>數據輸入</h3>
+                        <p>支援 CSV、Excel、SQL、API 等多種數據源接入</p>
+                    </div>
+                    <div class="step-number">01</div>
+                </div>
+                <div class="pipeline-connector"><div class="connector-line"></div><i class="fas fa-chevron-right"></i></div>
+                <div class="pipeline-step" data-step="2">
+                    <div class="step-icon"><i class="fas fa-broom"></i></div>
+                    <div class="step-content">
+                        <h3>數據清洗</h3>
+                        <p>自動處理缺失值、異常值偵測與數據型別轉換</p>
+                    </div>
+                    <div class="step-number">02</div>
+                </div>
+                <div class="pipeline-connector"><div class="connector-line"></div><i class="fas fa-chevron-right"></i></div>
+                <div class="pipeline-step" data-step="3">
+                    <div class="step-icon"><i class="fas fa-cogs"></i></div>
+                    <div class="step-content">
+                        <h3>特徵工程</h3>
+                        <p>自動化特徵生成、選擇與交互特徵深度探勘</p>
+                    </div>
+                    <div class="step-number">03</div>
+                </div>
+                <div class="pipeline-connector"><div class="connector-line"></div><i class="fas fa-chevron-right"></i></div>
+                <div class="pipeline-step" data-step="4">
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <div class="step-content">
+                        <h3>模型訓練</h3>
+                        <p>多演算法並行訓練，智慧超參數搜索優化</p>
+                    </div>
+                    <div class="step-number">04</div>
+                </div>
+                <div class="pipeline-connector"><div class="connector-line"></div><i class="fas fa-chevron-right"></i></div>
+                <div class="pipeline-step" data-step="5">
+                    <div class="step-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="step-content">
+                        <h3>預測與洞察</h3>
+                        <p>生成預測結果並提供可解釋的決策支援報告</p>
+                    </div>
+                    <div class="step-number">05</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section features-section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">CORE FEATURES</span>
+                <h2 class="section-title">六大 <span class="gradient-text">核心功能</span></h2>
+                <p class="section-desc">全面覆蓋機器學習生命週期的每一個關鍵環節</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon"><i class="fas fa-magic"></i></div>
+                    </div>
+                    <h3>智能數據清洗</h3>
+                    <p>自動偵測並處理缺失值、異常值與重複資料。支援多種插補策略，確保數據品質達到建模標準。</p>
+                    <div class="feature-tags">
+                        <span>缺失值處理</span><span>異常值偵測</span><span>型別推斷</span>
+                    </div>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon"><i class="fas fa-project-diagram"></i></div>
+                    </div>
+                    <h3>高階特徵工程</h3>
+                    <p>自動化特徵生成與選擇，包含多項式特徵、交互特徵、時間序列特徵提取與統計聚合特徵。</p>
+                    <div class="feature-tags">
+                        <span>自動特徵生成</span><span>特徵選擇</span><span>降維</span>
+                    </div>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+                    </div>
+                    <h3>多元演算法庫</h3>
+                    <p>整合 XGBoost、LightGBM、CatBoost、Random Forest 等頂尖演算法，針對不同數據特性自動選擇最佳模型。</p>
+                    <div class="feature-tags">
+                        <span>XGBoost</span><span>LightGBM</span><span>CatBoost</span>
+                    </div>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon"><i class="fas fa-sliders-h"></i></div>
+                    </div>
+                    <h3>超參數自動優化</h3>
+                    <p>採用貝葉斯優化與 Optuna 框架，在龐大的參數空間中高效搜索最優超參數組合。</p>
+                    <div class="feature-tags">
+                        <span>貝葉斯優化</span><span>Optuna</span><span>交叉驗證</span>
+                    </div>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+                    </div>
+                    <h3>互動式視覺化</h3>
+                    <p>提供豐富的互動圖表，包含模型效能比較、特徵重要性排名、學習曲線與混淆矩陣等視覺化工具。</p>
+                    <div class="feature-tags">
+                        <span>儀表板</span><span>即時圖表</span><span>報告匯出</span>
+                    </div>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+                    </div>
+                    <h3>決策支援系統</h3>
+                    <p>將模型輸出轉化為可執行的商業洞察，透過 SHAP 值與 LIME 提供透明可解釋的預測邏輯。</p>
+                    <div class="feature-tags">
+                        <span>SHAP</span><span>LIME</span><span>決策報告</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Dashboard Section -->
+    <section class="section dashboard-section" id="dashboard">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">INTERACTIVE DEMO</span>
+                <h2 class="section-title">互動式 <span class="gradient-text">分析儀表板</span></h2>
+                <p class="section-desc">探索平台的核心視覺化功能，體驗數據洞察的力量</p>
+            </div>
+
+            <!-- Dashboard Simulation -->
+            <div class="dashboard-wrapper">
+                <!-- Control Panel -->
+                <div class="dashboard-controls">
+                    <div class="control-group">
+                        <label>選擇任務類型</label>
+                        <div class="toggle-buttons">
+                            <button class="toggle-btn active" data-task="classification">
+                                <i class="fas fa-tags"></i> 分類任務
+                            </button>
+                            <button class="toggle-btn" data-task="regression">
+                                <i class="fas fa-chart-line"></i> 回歸任務
+                            </button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>選擇資料集</label>
+                        <select class="control-select" id="datasetSelect">
+                            <option value="credit">信用卡違約預測</option>
+                            <option value="house">房價預測</option>
+                            <option value="churn">客戶流失分析</option>
+                            <option value="sales">銷售額預測</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-run" id="runBtn">
+                        <i class="fas fa-play"></i> 執行 AutoML
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-section" id="progressSection" style="display:none;">
+                    <div class="progress-header">
+                        <span class="progress-title" id="progressTitle">初始化系統...</span>
+                        <span class="progress-percent" id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-steps">
+                        <div class="p-step active" id="ps1"><i class="fas fa-check-circle"></i> 數據載入</div>
+                        <div class="p-step" id="ps2"><i class="fas fa-circle"></i> 數據清洗</div>
+                        <div class="p-step" id="ps3"><i class="fas fa-circle"></i> 特徵工程</div>
+                        <div class="p-step" id="ps4"><i class="fas fa-circle"></i> 模型訓練</div>
+                        <div class="p-step" id="ps5"><i class="fas fa-circle"></i> 超參數優化</div>
+                        <div class="p-step" id="ps6"><i class="fas fa-circle"></i> 完成</div>
+                    </div>
+                </div>
+
+                <!-- Results Dashboard -->
+                <div class="dashboard-results" id="dashboardResults" style="display:none;">
+                    <!-- Summary Cards -->
+                    <div class="result-summary">
+                        <div class="summary-card">
+                            <div class="summary-icon best"><i class="fas fa-trophy"></i></div>
+                            <div class="summary-info">
+                                <span class="summary-label">最佳模型</span>
+                                <span class="summary-value" id="bestModel">XGBoost</span>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon accuracy"><i class="fas fa-bullseye"></i></div>
+                            <div class="summary-info">
+                                <span class="summary-label" id="metricLabel">準確率</span>
+                                <span class="summary-value" id="bestScore">96.8%</span>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon features"><i class="fas fa-cubes"></i></div>
+                            <div class="summary-info">
+                                <span class="summary-label">使用特徵數</span>
+                                <span class="summary-value" id="featureCount">24</span>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon time"><i class="fas fa-clock"></i></div>
+                            <div class="summary-info">
+                                <span class="summary-label">訓練耗時</span>
+                                <span class="summary-value" id="trainTime">12.4s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Tabs -->
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" data-chart="performance">
+                            <i class="fas fa-chart-bar"></i> 模型效能比較
+                        </button>
+                        <button class="chart-tab" data-chart="importance">
+                            <i class="fas fa-sort-amount-down"></i> 特徵重要性
+                        </button>
+                        <button class="chart-tab" data-chart="confusion">
+                            <i class="fas fa-th"></i> <span id="confusionTabLabel">混淆矩陣</span>
+                        </button>
+                        <button class="chart-tab" data-chart="learning">
+                            <i class="fas fa-graduation-cap"></i> 學習曲線
+                        </button>
+                        <button class="chart-tab" data-chart="hyperopt">
+                            <i class="fas fa-sliders-h"></i> 超參數優化
+                        </button>
+                    </div>
+
+                    <!-- Chart Panels -->
+                    <div class="chart-panels">
+                        <div class="chart-panel active" id="panel-performance">
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel" id="panel-importance">
+                            <div class="chart-container">
+                                <canvas id="importanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel" id="panel-confusion">
+                            <div class="chart-container" id="confusionContainer">
+                                <canvas id="confusionChart"></canvas>
+                                <!-- Residual plot for regression -->
+                                <canvas id="residualChart" style="display:none;"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel" id="panel-learning">
+                            <div class="chart-container">
+                                <canvas id="learningChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel" id="panel-hyperopt">
+                            <div class="chart-container">
+                                <canvas id="hyperoptChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models Section -->
+    <section class="section models-section" id="models">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">TECHNOLOGY CORE</span>
+                <h2 class="section-title">頂尖 <span class="gradient-text">演算法引擎</span></h2>
+                <p class="section-desc">匯集業界最強大的梯度提升演算法，為每一個預測任務提供最佳解方</p>
+            </div>
+            <div class="models-grid">
+                <div class="model-card">
+                    <div class="model-header xgb">
+                        <div class="model-logo">XGB</div>
+                        <h3>XGBoost</h3>
+                        <span class="model-badge">極致效能</span>
+                    </div>
+                    <div class="model-body">
+                        <p>eXtreme Gradient Boosting — 業界標準的梯度提升框架，以其卓越的預測精度與運算效率聞名。</p>
+                        <ul class="model-features">
+                            <li><i class="fas fa-check"></i> 正則化防止過擬合</li>
+                            <li><i class="fas fa-check"></i> 平行化樹構建</li>
+                            <li><i class="fas fa-check"></i> 內建缺失值處理</li>
+                            <li><i class="fas fa-check"></i> 靈活的自定義目標函數</li>
+                        </ul>
+                        <div class="model-metrics">
+                            <div class="metric"><span>速度</span><div class="metric-bar"><div class="metric-fill" style="width:85%"></div></div></div>
+                            <div class="metric"><span>精度</span><div class="metric-bar"><div class="metric-fill" style="width:95%"></div></div></div>
+                            <div class="metric"><span>可擴展性</span><div class="metric-bar"><div class="metric-fill" style="width:90%"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="model-card">
+                    <div class="model-header lgb">
+                        <div class="model-logo">LGB</div>
+                        <h3>LightGBM</h3>
+                        <span class="model-badge">極速訓練</span>
+                    </div>
+                    <div class="model-body">
+                        <p>Light Gradient Boosting Machine — 微軟開發的高效梯度提升框架，採用 GOSS 與 EFB 技術大幅提升訓練速度。</p>
+                        <ul class="model-features">
+                            <li><i class="fas fa-check"></i> 葉片優先生長策略</li>
+                            <li><i class="fas fa-check"></i> 直方圖加速算法</li>
+                            <li><i class="fas fa-check"></i> 原生類別特徵支援</li>
+                            <li><i class="fas fa-check"></i> 超低記憶體消耗</li>
+                        </ul>
+                        <div class="model-metrics">
+                            <div class="metric"><span>速度</span><div class="metric-bar"><div class="metric-fill" style="width:98%"></div></div></div>
+                            <div class="metric"><span>精度</span><div class="metric-bar"><div class="metric-fill" style="width:93%"></div></div></div>
+                            <div class="metric"><span>可擴展性</span><div class="metric-bar"><div class="metric-fill" style="width:95%"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="model-card">
+                    <div class="model-header cat">
+                        <div class="model-logo">CAT</div>
+                        <h3>CatBoost</h3>
+                        <span class="model-badge">類別資料專家</span>
+                    </div>
+                    <div class="model-body">
+                        <p>Yandex 開發的梯度提升演算法，專為處理類別型特徵設計，無需手動編碼即可達到優異效能。</p>
+                        <ul class="model-features">
+                            <li><i class="fas fa-check"></i> 有序目標編碼</li>
+                            <li><i class="fas fa-check"></i> 對稱樹結構</li>
+                            <li><i class="fas fa-check"></i> GPU 加速訓練</li>
+                            <li><i class="fas fa-check"></i> 強大的抗過擬合能力</li>
+                        </ul>
+                        <div class="model-metrics">
+                            <div class="metric"><span>速度</span><div class="metric-bar"><div class="metric-fill" style="width:80%"></div></div></div>
+                            <div class="metric"><span>精度</span><div class="metric-bar"><div class="metric-fill" style="width:92%"></div></div></div>
+                            <div class="metric"><span>可擴展性</span><div class="metric-bar"><div class="metric-fill" style="width:88%"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-table-wrap">
+                <h3 class="comparison-title"><i class="fas fa-balance-scale"></i> 演算法比較總覽</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>特性</th>
+                            <th>XGBoost</th>
+                            <th>LightGBM</th>
+                            <th>CatBoost</th>
+                            <th>Random Forest</th>
+                            <th>SVM</th>
+                            <th>Neural Network</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>訓練速度</td>
+                            <td><span class="rate rate-4">快</span></td>
+                            <td><span class="rate rate-5">極快</span></td>
+                            <td><span class="rate rate-3">中等</span></td>
+                            <td><span class="rate rate-3">中等</span></td>
+                            <td><span class="rate rate-2">慢</span></td>
+                            <td><span class="rate rate-2">慢</span></td>
+                        </tr>
+                        <tr>
+                            <td>預測精度</td>
+                            <td><span class="rate rate-5">極高</span></td>
+                            <td><span class="rate rate-5">極高</span></td>
+                            <td><span class="rate rate-4">高</span></td>
+                            <td><span class="rate rate-3">中等</span></td>
+                            <td><span class="rate rate-3">中等</span></td>
+                            <td><span class="rate rate-4">高</span></td>
+                        </tr>
+                        <tr>
+                            <td>可解釋性</td>
+                            <td><span class="rate rate-4">好</span></td>
+                            <td><span class="rate rate-4">好</span></td>
+                            <td><span class="rate rate-4">好</span></td>
+                            <td><span class="rate rate-4">好</span></td>
+                            <td><span class="rate rate-2">差</span></td>
+                            <td><span class="rate rate-1">極差</span></td>
+                        </tr>
+                        <tr>
+                            <td>類別特徵</td>
+                            <td><span class="rate rate-3">需編碼</span></td>
+                            <td><span class="rate rate-4">原生支援</span></td>
+                            <td><span class="rate rate-5">最優支援</span></td>
+                            <td><span class="rate rate-3">需編碼</span></td>
+                            <td><span class="rate rate-2">需編碼</span></td>
+                            <td><span class="rate rate-3">需編碼</span></td>
+                        </tr>
+                        <tr>
+                            <td>記憶體效率</td>
+                            <td><span class="rate rate-3">中等</span></td>
+                            <td><span class="rate rate-5">極佳</span></td>
+                            <td><span class="rate rate-3">中等</span></td>
+                            <td><span class="rate rate-2">高消耗</span></td>
+                            <td><span class="rate rate-2">高消耗</span></td>
+                            <td><span class="rate rate-4">良好</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section about-section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">ABOUT PLATFORM</span>
+                <h2 class="section-title">關於 <span class="gradient-text">AutoML Pro</span></h2>
+                <p class="section-desc">打造讓每個人都能駕馭機器學習的智慧平台</p>
+            </div>
+            <div class="about-content">
+                <div class="about-vision">
+                    <div class="vision-card">
+                        <div class="vision-icon"><i class="fas fa-eye"></i></div>
+                        <h3>願景</h3>
+                        <p>消弭原始資料與商業決策間的資訊落差，讓數據驅動的決策不再是少數專家的專利，而是每一位決策者手中的利器。</p>
+                    </div>
+                    <div class="vision-card">
+                        <div class="vision-icon"><i class="fas fa-bullseye"></i></div>
+                        <h3>使命</h3>
+                        <p>將複雜的機器學習流程自動化，透過直觀的介面與強大的後端引擎，賦予使用者從數據中提取價值的超能力。</p>
+                    </div>
+                    <div class="vision-card">
+                        <div class="vision-icon"><i class="fas fa-users"></i></div>
+                        <h3>適用對象</h3>
+                        <p>無論您是資料科學家、產業分析師還是商業決策者，AutoML Pro 都能根據您的需求，提供最適切的分析工具。</p>
+                    </div>
+                </div>
+                <div class="tech-stack">
+                    <h3 class="stack-title">技術堆疊</h3>
+                    <div class="stack-items">
+                        <div class="stack-item"><div class="stack-icon">🐍</div><span>Python</span></div>
+                        <div class="stack-item"><div class="stack-icon">📊</div><span>Scikit-learn</span></div>
+                        <div class="stack-item"><div class="stack-icon">🚀</div><span>XGBoost</span></div>
+                        <div class="stack-item"><div class="stack-icon">💡</div><span>LightGBM</span></div>
+                        <div class="stack-item"><div class="stack-icon">🎯</div><span>Optuna</span></div>
+                        <div class="stack-item"><div class="stack-icon">📈</div><span>SHAP</span></div>
+                        <div class="stack-item"><div class="stack-icon">🔬</div><span>Pandas</span></div>
+                        <div class="stack-item"><div class="stack-icon">🧮</div><span>NumPy</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                        <span>AutoML <span class="logo-accent">Pro</span></span>
+                    </div>
+                    <p>全方位端對端自動機器學習平台</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>平台</h4>
+                        <a href="#pipeline">系統架構</a>
+                        <a href="#features">功能特色</a>
+                        <a href="#dashboard">互動展示</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>技術</h4>
+                        <a href="#models">演算法引擎</a>
+                        <a href="#about">關於平台</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 AutoML Pro — 國立清華大學 人工智慧概論 期末專案</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

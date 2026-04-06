@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoML 端對端平台 - 高效決策助手</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.2/echarts.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左側導覽列 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="app-logo">🤖 AutoML</h1>
+                <p class="app-tagline">智慧決策平台</p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item active" data-view="dashboard">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            <span class="nav-text">儀表板</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-view="datasets">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">📂</span>
+                            <span class="nav-text">數據集管理</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-view="experiments">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">🧪</span>
+                            <span class="nav-text">實驗室</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-view="leaderboard">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">🏆</span>
+                            <span class="nav-text">模型排行榜</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-view="insights">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">💡</span>
+                            <span class="nav-text">洞察與決策</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-view="deployments">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">🚀</span>
+                            <span class="nav-text">部署與 API</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-info">
+                        <p class="user-name">資料科學家</p>
+                        <p class="user-role">團隊主管</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主內容區域 -->
+        <main class="main-content">
+            <!-- 頂部狀態欄 -->
+            <header class="top-bar">
+                <div class="breadcrumb-wrapper">
+                    <span class="breadcrumb">首頁</span>
+                    <span class="breadcrumb-sep">/</span>
+                    <span class="breadcrumb" id="currentPage">儀表板</span>
+                </div>
+                <div class="top-right-tools">
+                    <button class="btn-icon" title="通知">🔔</button>
+                    <button class="btn-icon" title="設定">⚙️</button>
+                </div>
+            </header>
+
+            <!-- 內容區域 -->
+            <div class="content-area">
+
+                <!-- 1. 儀表板視圖 -->
+                <div class="view-container active" id="dashboard-view">
+                    <div class="page-header">
+                        <h2>儀表板</h2>
+                        <p class="page-subtitle">總覽您的 AutoML 專案進度與關鍵指標</p>
+                    </div>
+
+                    <!-- 快速統計卡片 -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <p class="stat-label">活躍實驗</p>
+                                <p class="stat-value">12</p>
+                                <p class="stat-trend">↑ 3 今日</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-content">
+                                <p class="stat-label">已部署模型</p>
+                                <p class="stat-value">8</p>
+                                <p class="stat-trend">✓ 全部穩定</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <p class="stat-label">平均準確率</p>
+                                <p class="stat-value">92.5%</p>
+                                <p class="stat-trend">↑ +2.3% 本周</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-content">
+                                <p class="stat-label">平均訓練時間</p>
+                                <p class="stat-value">4.2 h</p>
+                                <p class="stat-trend">↓ -15 min</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 進行中的實驗進度 -->
+                    <div class="card-section">
+                        <h3>進行中的實驗進度</h3>
+                        <div class="progress-container">
+                            <div class="experiment-progress">
+                                <div class="progress-header">
+                                    <span>銷售預測模型 v2.1</span>
+                                    <span class="progress-percent">65%</span>
+                                </div>
+                                <div class="progress-bar-wrapper">
+                                    <div class="progress-stages">
+                                        <div class="stage completed">數據清洗</div>
+                                        <div class="stage completed">特徵工程</div>
+                                        <div class="stage active">模型尋優</div>
+                                        <div class="stage">評估</div>
+                                    </div>
+                                </div>
+                                <div class="progress-info">
+                                    <span>預估剩餘時間: 2 小時 15 分鐘</span>
+                                </div>
+                            </div>
+
+                            <div class="experiment-progress">
+                                <div class="progress-header">
+                                    <span>客戶流失預測</span>
+                                    <span class="progress-percent">40%</span>
+                                </div>
+                                <div class="progress-bar-wrapper">
+                                    <div class="progress-stages">
+                                        <div class="stage completed">數據清洗</div>
+                                        <div class="stage active">特徵工程</div>
+                                        <div class="stage">模型尋優</div>
+                                        <div class="stage">評估</div>
+                                    </div>
+                                </div>
+                                <div class="progress-info">
+                                    <span>預估剩餘時間: 3 小時 45 分鐘</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 最近活動日誌 -->
+                    <div class="card-section">
+                        <h3>最近活動日誌</h3>
+                        <div class="activity-timeline">
+                            <div class="activity-item success">
+                                <div class="activity-icon">✓</div>
+                                <div class="activity-content">
+                                    <p><strong>XGBoost 模型</strong> 在銷售預測中完成訓練，F1-Score: 0.94</p>
+                                    <time>2 小時前</time>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">⚙️</div>
+                                <div class="activity-content">
+                                    <p>特徵工程已自動完成，生成 <strong>48 個新特徵</strong></p>
+                                    <time>5 小時前</time>
+                                </div>
+                            </div>
+                            <div class="activity-item info">
+                                <div class="activity-icon">ℹ️</div>
+                                <div class="activity-content">
+                                    <p>已自動填補 <strong>3.2% 的缺失值</strong>，使用 KNN 插值法</p>
+                                    <time>1 天前</time>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 數據集管理視圖 -->
+                <div class="view-container" id="datasets-view">
+                    <div class="page-header">
+                        <h2>數據集管理</h2>
+                        <button class="btn btn-primary">➕ 添加新數據集</button>
+                    </div>
+
+                    <div class="datasets-grid">
+                        <div class="dataset-card">
+                            <div class="dataset-header">
+                                <h4>銷售數據2024</h4>
+                                <span class="badge">已上傳</span>
+                            </div>
+                            <div class="health-score-container">
+                                <div class="health-gauge">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="#e0e0e0" stroke-width="6"></circle>
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" 
+                                            stroke-dasharray="310" stroke-dashoffset="60" stroke-linecap="round"></circle>
+                                        <text x="50" y="60" text-anchor="middle" font-size="20" font-weight="bold" fill="#000">85%</text>
+                                    </svg>
+                                </div>
+                                <div class="health-details">
+                                    <p>數據完整性: <strong>92%</strong></p>
+                                    <p>異常值: <strong>2.3%</strong></p>
+                                    <p>缺失值: <strong>5.5%</strong></p>
+                                </div>
+                            </div>
+                            <div class="dataset-stats">
+                                <span>📊 50,000 筆</span>
+                                <span>📋 23 欄位</span>
+                                <span>📅 2024-01-15</span>
+                            </div>
+                        </div>
+
+                        <div class="dataset-card">
+                            <div class="dataset-header">
+                                <h4>客戶行為日誌</h4>
+                                <span class="badge">處理中</span>
+                            </div>
+                            <div class="health-score-container">
+                                <div class="health-gauge">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="#e0e0e0" stroke-width="6"></circle>
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="#f59e0b" stroke-width="6" 
+                                            stroke-dasharray="310" stroke-dashoffset="100" stroke-linecap="round"></circle>
+                                        <text x="50" y="60" text-anchor="middle" font-size="20" font-weight="bold" fill="#000">68%</text>
+                                    </svg>
+                                </div>
+                                <div class="health-details">
+                                    <p>數據完整性: <strong>72%</strong></p>
+                                    <p>異常值: <strong>8.1%</strong></p>
+                                    <p>缺失值: <strong>19.8%</strong></p>
+                                </div>
+                            </div>
+                            <div class="dataset-stats">
+                                <span>📊 120,000 筆</span>
+                                <span>📋 15 欄位</span>
+                                <span>📅 2024-01-20</span>
+                            </div>
+                        </div>
+
+                        <div class="dataset-card">
+                            <div class="dataset-header">
+                                <h4>市場趨勢數據</h4>
+                                <span class="badge">就緒</span>
+                            </div>
+                            <div class="health-score-container">
+                                <div class="health-gauge">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="#e0e0e0" stroke-width="6"></circle>
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" 
+                                            stroke-dasharray="310" stroke-dashoffset="30" stroke-linecap="round"></circle>
+                                        <text x="50" y="60" text-anchor="middle" font-size="20" font-weight="bold" fill="#000">95%</text>
+                                    </svg>
+                                </div>
+                                <div class="health-details">
+                                    <p>數據完整性: <strong>98%</strong></p>
+                                    <p>異常值: <strong>1.2%</strong></p>
+                                    <p>缺失值: <strong>0.8%</strong></p>
+                                </div>
+                            </div>
+                            <div class="dataset-stats">
+                                <span>📊 30,000 筆</span>
+                                <span>📋 12 欄位</span>
+                                <span>📅 2024-01-18</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 實驗室視圖 -->
+                <div class="view-container" id="experiments-view">
+                    <div class="page-header">
+                        <h2>實驗室</h2>
+                        <button class="btn btn-primary">➕ 創建新實驗</button>
+                    </div>
+
+                    <div class="experiment-form-card">
+                        <h3>無程式碼配置表單</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>步驟 1: 選擇目標變數</label>
+                                <select class="form-control">
+                                    <option>-- 選擇數據集 --</option>
+                                    <option>銷售數據2024</option>
+                                    <option>客戶行為日誌</option>
+                                    <option>市場趨勢數據</option>
+                                </select>
+                                <select class="form-control" style="margin-top: 10px;">
+                                    <option>-- 選擇目標變數 --</option>
+                                    <option>銷售額</option>
+                                    <option>客戶滿意度</option>
+                                    <option>是否購買</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>步驟 2: 任務類型</label>
+                                <div class="task-type-selector">
+                                    <label class="radio-btn">
+                                        <input type="radio" name="task" value="regression" checked>
+                                        <span>🔄 回歸</span>
+                                    </label>
+                                    <label class="radio-btn">
+                                        <input type="radio" name="task" value="classification">
+                                        <span>🎯 分類</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>步驟 3: 時間序列模式</label>
+                                <label class="checkbox-btn">
+                                    <input type="checkbox">
+                                    <span>🕐 啟用時間序列模式</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" style="width: 100%; margin-top: 20px;">開始訓練</button>
+                    </div>
+
+                    <div class="pipeline-visualization">
+                        <h3>Pipeline 視覺化</h3>
+                        <div id="pipeline-chart" style="width: 100%; height: 300px;"></div>
+                    </div>
+                </div>
+
+                <!-- 4. 模型排行榜視圖 -->
+                <div class="view-container" id="leaderboard-view">
+                    <div class="page-header">
+                        <h2>模型排行榜</h2>
+                        <p class="page-subtitle">所有訓練模型的效能排名</p>
+                    </div>
+
+                    <div class="leaderboard-table-wrapper">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>演算法</th>
+                                    <th>F1-Score</th>
+                                    <th>準確率</th>
+                                    <th>RMSE</th>
+                                    <th>訓練時間</th>
+                                    <th>推論延遲</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="best-row">
+                                    <td>🥇 1</td>
+                                    <td><strong>XGBoost</strong></td>
+                                    <td><span class="badge-score">0.94</span></td>
+                                    <td>92.1%</td>
+                                    <td>0.34</td>
+                                    <td>2h 15m</td>
+                                    <td>8ms</td>
+                                    <td>
+                                        <button class="btn-sm">📊 詳情</button>
+                                        <button class="btn-sm">✓ 部署</button>
+                                    </td>
+                                </tr>
+                                <tr class="fast-row">
+                                    <td>🥈 2</td>
+                                    <td><strong>LightGBM</strong></td>
+                                    <td><span class="badge-score">0.91</span></td>
+                                    <td>89.5%</td>
+                                    <td>0.42</td>
+                                    <td>45m</td>
+                                    <td>3ms ⚡</td>
+                                    <td>
+                                        <button class="btn-sm">📊 詳情</button>
+                                        <button class="btn-sm">✓ 部署</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>🥉 3</td>
+                                    <td><strong>Random Forest</strong></td>
+                                    <td><span class="badge-score">0.87</span></td>
+                                    <td>85.2%</td>
+                                    <td>0.58</td>
+                                    <td>1h 30m</td>
+                                    <td>12ms</td>
+                                    <td>
+                                        <button class="btn-sm">📊 詳情</button>
+                                        <button class="btn-sm">✓ 部署</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td><strong>Neural Network</strong></td>
+                                    <td><span class="badge-score">0.88</span></td>
+                                    <td>86.8%</td>
+                                    <td>0.51</td>
+                                    <td>4h 20m</td>
+                                    <td>25ms</td>
+                                    <td>
+                                        <button class="btn-sm">📊 詳情</button>
+                                        <button class="btn-sm">✓ 部署</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td><strong>SVM</strong></td>
+                                    <td><span class="badge-score">0.79</span></td>
+                                    <td>77.3%</td>
+                                    <td>0.71</td>
+                                    <td>3h 45m</td>
+                                    <td>18ms</td>
+                                    <td>
+                                        <button class="btn-sm">📊 詳情</button>
+                                        <button class="btn-sm">✓ 部署</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="compare-section">
+                        <h3>模型比較工具</h3>
+                        <div class="compare-buttons">
+                            <button class="btn btn-outline">🔄 比較 XGBoost vs LightGBM</button>
+                            <button class="btn btn-outline">🔄 比較 XGBoost vs Random Forest</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. 洞察與決策視圖 -->
+                <div class="view-container" id="insights-view">
+                    <div class="page-header">
+                        <h2>洞察與決策支援</h2>
+                        <p class="page-subtitle">可解釋性分析與 What-If 模擬器</p>
+                    </div>
+
+                    <div class="insights-layout">
+                        <!-- 左側：特徵重要性 -->
+                        <div class="insights-section">
+                            <h3>全域特徵重要性</h3>
+                            <div id="feature-importance-chart" style="width: 100%; height: 400px;"></div>
+                        </div>
+
+                        <!-- 中間：SHAP 瀑布圖 -->
+                        <div class="insights-section">
+                            <h3>SHAP Value 瀑布圖（單一預測）</h3>
+                            <div class="shap-legend">
+                                <span class="legend-item positive">📈 正向影響</span>
+                                <span class="legend-item negative">📉 負向影響</span>
+                            </div>
+                            <div id="shap-waterfall-chart" style="width: 100%; height: 400px;"></div>
+                        </div>
+
+                        <!-- What-If 模擬器 -->
+                        <div class="insights-section what-if-section">
+                            <h3>What-If 模擬器</h3>
+                            <div class="simulator-container">
+                                <div class="simulator-controls">
+                                    <div class="slider-group">
+                                        <label>行銷預算</label>
+                                        <input type="range" min="0" max="100" value="50" class="simulator-slider" id="budget-slider">
+                                        <span class="slider-value">50%</span>
+                                    </div>
+                                    <div class="slider-group">
+                                        <label>交貨時間</label>
+                                        <input type="range" min="-5" max="5" value="0" class="simulator-slider" id="delivery-slider">
+                                        <span class="slider-value">0 天</span>
+                                    </div>
+                                    <div class="slider-group">
+                                        <label>客戶滿意度分數</label>
+                                        <input type="range" min="1" max="10" value="5" class="simulator-slider" id="satisfaction-slider">
+                                        <span class="slider-value">5.0</span>
+                                    </div>
+                                    <div class="slider-group">
+                                        <label>產品價格</label>
+                                        <input type="range" min="0" max="200" value="100" class="simulator-slider" id="price-slider">
+                                        <span class="slider-value">$100</span>
+                                    </div>
+                                </div>
+                                <div class="simulator-result">
+                                    <div class="result-gauge">
+                                        <div class="gauge-value" id="prediction-result">78.5%</div>
+                                        <p>預測購買機率</p>
+                                    </div>
+                                    <div class="result-details">
+                                        <p>💡 <strong>決策建議:</strong></p>
+                                        <p class="suggestion" id="decision-suggestion">基於當前參數，建議增加行銷預算以提高購買機率。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. 部署與 API 視圖 -->
+                <div class="view-container" id="deployments-view">
+                    <div class="page-header">
+                        <h2>部署與 API</h2>
+                        <button class="btn btn-primary">🚀 部署新模型</button>
+                    </div>
+
+                    <div class="deployments-grid">
+                        <div class="deployment-card deployed">
+                            <div class="deployment-header">
+                                <h4>銷售預測 v2.1</h4>
+                                <span class="status-badge online">● 線上</span>
+                            </div>
+                            <div class="deployment-info">
+                                <p><strong>模型:</strong> XGBoost</p>
+                                <p><strong>版本:</strong> 2.1.0</p>
+                                <p><strong>部署時間:</strong> 2024-01-15 14:30</p>
+                                <p><strong>可用性:</strong> 99.8%</p>
+                            </div>
+                            <div class="api-endpoint">
+                                <p class="endpoint-label">API 端點:</p>
+                                <code>/api/predict/sales-forecast</code>
+                            </div>
+                            <div class="deployment-actions">
+                                <button class="btn btn-sm btn-outline">📊 監控</button>
+                                <button class="btn btn-sm btn-outline">📝 文檔</button>
+                                <button class="btn btn-sm btn-danger">下架</button>
+                            </div>
+                        </div>
+
+                        <div class="deployment-card deployed">
+                            <div class="deployment-header">
+                                <h4>客戶流失預測</h4>
+                                <span class="status-badge online">● 線上</span>
+                            </div>
+                            <div class="deployment-info">
+                                <p><strong>模型:</strong> LightGBM</p>
+                                <p><strong>版本:</strong> 1.5.0</p>
+                                <p><strong>部署時間:</strong> 2024-01-10 09:15</p>
+                                <p><strong>可用性:</strong> 99.9%</p>
+                            </div>
+                            <div class="api-endpoint">
+                                <p class="endpoint-label">API 端點:</p>
+                                <code>/api/predict/churn-prediction</code>
+                            </div>
+                            <div class="deployment-actions">
+                                <button class="btn btn-sm btn-outline">📊 監控</button>
+                                <button class="btn btn-sm btn-outline">📝 文檔</button>
+                                <button class="btn btn-sm btn-danger">下架</button>
+                            </div>
+                        </div>
+
+                        <div class="deployment-card staging">
+                            <div class="deployment-header">
+                                <h4>季節性分析模型</h4>
+                                <span class="status-badge staging">● 測試環境</span>
+                            </div>
+                            <div class="deployment-info">
+                                <p><strong>模型:</strong> Prophet</p>
+                                <p><strong>版本:</strong> 1.0.0-beta</p>
+                                <p><strong>部署時間:</strong> 2024-01-18 16:45</p>
+                                <p><strong>測試進度:</strong> 75%</p>
+                            </div>
+                            <div class="api-endpoint">
+                                <p class="endpoint-label">測試端點:</p>
+                                <code>/api/test/seasonality-analysis</code>
+                            </div>
+                            <div class="deployment-actions">
+                                <button class="btn btn-sm btn-success">✓ 上線</button>
+                                <button class="btn btn-sm btn-outline">📝 文檔</button>
+                                <button class="btn btn-sm btn-outline">🗑️ 刪除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
