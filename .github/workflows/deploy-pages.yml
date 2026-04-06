@@ -1,0 +1,101 @@
+name: Deploy GitHub Pages (B Repo)
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_folder:
+        description: "Source folder for GitHub Pages"
+        required: true
+        default: "version4"
+        type: choice
+        options:
+          - version1
+          - version2
+          - version3
+          - version4
+          - root
+  push:
+    branches:
+      - main
+    paths:
+      - "version4/**"
+      - ".github/workflows/deploy-pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Determine source folder
+        id: source
+        run: |
+          SOURCE_FOLDER="${{ github.event.inputs.source_folder || 'version4' }}"
+
+          if [ "$SOURCE_FOLDER" = "root" ]; then
+            echo "folder=." >> $GITHUB_OUTPUT
+            echo "✅ Using repository root"
+          elif [ -d "$SOURCE_FOLDER" ]; then
+            echo "folder=$SOURCE_FOLDER" >> $GITHUB_OUTPUT
+            echo "✅ Found source folder: $SOURCE_FOLDER"
+          else
+            echo "❌ Folder not found: $SOURCE_FOLDER"
+            exit 1
+          fi
+
+      - name: Copy source folder content
+        run: |
+          SOURCE="${{ steps.source.outputs.folder }}"
+          DEST="_site"
+
+          echo "=== Copying from $SOURCE to $DEST ==="
+          mkdir -p "$DEST"
+
+          if [ "$SOURCE" = "." ]; then
+            cp -r ./* "$DEST/" 2>/dev/null || true
+            rm -rf "$DEST/.git" "$DEST/.github"
+          else
+            cp -r "$SOURCE"/* "$DEST/" 2>/dev/null || true
+          fi
+
+          echo "✅ Content copied successfully"
+          echo "📁 Files in _site:"
+          ls -la "$DEST/" | head -20
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: "_site"
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+      - name: Deployment Summary
+        run: |
+          echo "=== 📄 GitHub Pages 部署完成 ==="
+          echo "✅ 已部署到: ${{ steps.deployment.outputs.page_url }}"
+          echo "📁 來源資料夾: ${{ github.event.inputs.source_folder || 'version4' }}"
+          echo "🕐 部署時間: $(date -u)"
