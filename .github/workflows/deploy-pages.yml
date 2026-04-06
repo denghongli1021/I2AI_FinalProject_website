@@ -25,28 +25,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Copy content to _site
-        run: |
-          mkdir -p _site
-
-          # 檢查 version4 是否存在，並使用 /. 複製包含隱藏檔的所有內容
-          if [ -d "version4" ]; then
-            echo "📁 Deploying from version4 folder"
-            cp -a version4/. _site/
-          else
-            echo "📁 Deploying from repository root"
-            cp -a . _site/
-            rm -rf _site/.git _site/.github
-          fi
-
-          echo "✅ Files ready for deployment:"
-          ls -la _site/ | head -15
-
+      # 直接使用官方套件上傳指定的資料夾，不需要自己下 cp 指令搬移檔案
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: "_site"
- 
+          # 👇 在這裡宣告您的網頁資料夾名稱！例如 version4、public 或 dist
+          path: "version4" 
+
   deploy:
     environment:
       name: github-pages
