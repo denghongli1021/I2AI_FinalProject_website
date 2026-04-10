@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPreviewPagination();
   initCorrTopN();
   initShapSampleSelect();
+  initSettings();
   // Show demo data on first load
   showDemoDataset();
   setTimeout(() => renderPageCharts('dashboard'), 100);
@@ -1955,14 +1956,19 @@ function renderRealLeaderboard() {
 }
 
 function initRealCompare(models, isReg) {
-  const compareBtn = document.getElementById('btn-compare');
+  const oldBtn = document.getElementById('btn-compare');
   const selectAllCb = document.getElementById('select-all-models');
-  if (!compareBtn) return;
+  if (!oldBtn) return;
+
+  const newBtn = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
 
   const updateCompareState = () => {
     const checked = document.querySelectorAll('.model-select-cb:checked');
-    compareBtn.disabled = checked.length < 2;
+    newBtn.disabled = checked.length < 2;
   };
+
+  newBtn.disabled = true;
 
   // Rebind checkboxes
   document.querySelectorAll('.model-select-cb').forEach(cb => {
@@ -1978,9 +1984,6 @@ function initRealCompare(models, isReg) {
   }
 
   // Compare button click
-  const newBtn = compareBtn.cloneNode(true);
-  compareBtn.parentNode.replaceChild(newBtn, compareBtn);
-  newBtn.disabled = true;
   newBtn.addEventListener('click', () => {
     const checkedIdxs = [...document.querySelectorAll('.model-select-cb:checked')].map(cb => parseInt(cb.dataset.idx));
     if (checkedIdxs.length < 2) return;
@@ -2022,6 +2025,15 @@ function renderRealCompareCharts(models, isReg) {
   }
 
   // Bar comparison
+  const confTitle = document.getElementById('compare-modal-conf-title');
+  if (confTitle) confTitle.textContent = isReg ? '模型分數比較' : '混淆矩陣比較';
+  
+  const rocSection = document.getElementById('compare-modal-roc-section');
+  if (rocSection) {
+    if (isReg) rocSection.classList.add('hidden');
+    else rocSection.classList.remove('hidden');
+  }
+
   const confChart = initChart('chart-compare-confusion');
   if (confChart) {
     const scoreLabel = isReg ? 'R²' : 'Accuracy';
@@ -2209,6 +2221,87 @@ function updateDashboardRealMetrics() {
     cards[2].querySelector('.text-dark-400.text-sm').textContent = isReg ? '最佳模型 R²' : '最佳模型準確率';
     // Deployed models
     cards[3].querySelector('.text-3xl').textContent = '0';
+  }
+}
+
+// ===== SYSTEM SETTINGS =====
+function initSettings() {
+  const timeoutSel = document.getElementById('setting-timeout');
+  const autofeCb = document.getElementById('setting-autofe');
+  const hpoInput = document.getElementById('setting-hpotrials');
+  const emailCb = document.getElementById('setting-email');
+  const kfoldSel = document.getElementById('setting-kfold');
+  const algoContainer = document.getElementById('setting-algos-container');
+  const saveBtn = document.getElementById('btn-save-settings');
+  const toast = document.getElementById('settings-save-toast');
+
+  let activeAlgos = ['XGBoost', 'LightGBM', 'CatBoost'];
+
+  const renderAlgos = () => {
+    if (!algoContainer) return;
+    algoContainer.querySelectorAll('.setting-algo-chip').forEach(chip => {
+      const val = chip.dataset.val;
+      if (activeAlgos.includes(val)) {
+        chip.className = 'setting-algo-chip text-xs bg-primary-500/10 text-primary-400 px-2 py-1 rounded-lg cursor-pointer select-none';
+      } else {
+        chip.className = 'setting-algo-chip text-xs bg-dark-600 text-dark-400 px-2 py-1 rounded-lg cursor-pointer select-none';
+      }
+    });
+  };
+
+  if (algoContainer) {
+    algoContainer.addEventListener('click', (e) => {
+      const chip = e.target.closest('.setting-algo-chip');
+      if (chip) {
+        const val = chip.dataset.val;
+        if (activeAlgos.includes(val)) {
+          activeAlgos = activeAlgos.filter(v => v !== val);
+        } else {
+          activeAlgos.push(val);
+        }
+        renderAlgos();
+      }
+    });
+  }
+
+  // Load from localStorage
+  const configStr = localStorage.getItem('automl_settings');
+  if (configStr) {
+    try {
+      const config = JSON.parse(configStr);
+      if (timeoutSel && config.timeout) timeoutSel.value = config.timeout;
+      if (autofeCb && config.autofe !== undefined) autofeCb.checked = config.autofe;
+      if (hpoInput && config.hpo) hpoInput.value = config.hpo;
+      if (emailCb && config.email !== undefined) emailCb.checked = config.email;
+      if (kfoldSel && config.kfold) kfoldSel.value = config.kfold;
+      if (config.activeAlgos) {
+        activeAlgos = config.activeAlgos;
+        renderAlgos();
+      }
+    } catch (e) {}
+  } else {
+    renderAlgos(); // Initial render for defaults
+  }
+
+  // Save to localStorage
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const newConfig = {
+        timeout: timeoutSel ? timeoutSel.value : '1 小時',
+        autofe: autofeCb ? autofeCb.checked : true,
+        hpo: hpoInput ? hpoInput.value : 200,
+        email: emailCb ? emailCb.checked : true,
+        kfold: kfoldSel ? kfoldSel.value : '5-Fold',
+        activeAlgos: activeAlgos
+      };
+      localStorage.setItem('automl_settings', JSON.stringify(newConfig));
+      
+      // Toast animation
+      if (toast) {
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+      }
+    });
   }
 }
 

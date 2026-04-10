@@ -574,14 +574,18 @@
                 <!-- Feature Columns -->
                 <div class="md:col-span-2">
                   <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-medium text-dark-300">特徵欄位 <span id="exp-feature-count" class="text-dark-500 font-normal"></span></label>
-                    <div class="flex gap-2">
-                      <button type="button" id="exp-feat-all" class="text-xs text-primary-400 hover:text-primary-300 transition-colors">全選</button>
-                      <span class="text-dark-600 text-xs">|</span>
-                      <button type="button" id="exp-feat-none" class="text-xs text-dark-400 hover:text-dark-300 transition-colors">全不選</button>
+                    <div class="flex items-center gap-4">
+                      <label class="block text-sm font-medium text-dark-300">特徵欄位 <span id="exp-feature-count" class="text-dark-500 font-normal"></span></label>
+                      <input type="text" id="exp-feature-search" placeholder="搜尋欄位..." class="bg-dark-800 border border-dark-700 rounded px-2 py-1 text-xs focus:border-primary-500 outline-none w-32">
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button type="button" id="exp-feat-all" class="text-[11px] px-2 py-1 bg-dark-800 border border-dark-700 rounded text-dark-300 hover:text-primary-400 transition-colors">全選</button>
+                      <button type="button" id="exp-feat-none" class="text-[11px] px-2 py-1 bg-dark-800 border border-dark-700 rounded text-dark-300 hover:text-dark-100 transition-colors">清除</button>
                     </div>
                   </div>
-                  <div id="exp-feature-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-48 overflow-y-auto p-3 rounded-lg bg-dark-800 border border-dark-600"></div>
+                  <div id="exp-feature-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-48 overflow-y-auto p-3 rounded-lg bg-dark-900/50 border border-dark-700/50">
+                    <!-- 動態生成特徵選取，建議加上 title 屬性處理長字串 -->
+                  </div>
                 </div>
                 <!-- Algorithm Selection -->
                 <div class="md:col-span-2">
@@ -903,11 +907,11 @@
                   <div id="chart-compare-radar" class="h-72"></div>
                 </div>
                 <div>
-                  <h4 class="text-sm font-medium text-dark-300 mb-3">混淆矩陣比較</h4>
+                  <h4 id="compare-modal-conf-title" class="text-sm font-medium text-dark-300 mb-3">混淆矩陣比較</h4>
                   <div id="chart-compare-confusion" class="h-72"></div>
                 </div>
               </div>
-              <div class="mt-6">
+              <div class="mt-6" id="compare-modal-roc-section">
                 <h4 class="text-sm font-medium text-dark-300 mb-3">ROC 曲線比較</h4>
                 <div id="chart-compare-roc" class="h-64"></div>
               </div>
@@ -1336,7 +1340,7 @@
                     <p class="text-sm font-medium">預設任務超時時間</p>
                     <p class="text-xs text-dark-400">超過此時間的訓練將自動停止</p>
                   </div>
-                  <select class="bg-dark-700 border border-dark-600 rounded-lg px-3 py-1.5 text-sm focus:border-primary-500 outline-none">
+                  <select id="setting-timeout" class="bg-dark-700 border border-dark-600 rounded-lg px-3 py-1.5 text-sm focus:border-primary-500 outline-none">
                     <option>30 分鐘</option>
                     <option selected>1 小時</option>
                     <option>2 小時</option>
@@ -1349,7 +1353,7 @@
                     <p class="text-xs text-dark-400">自動產生交互特徵與多項式特徵</p>
                   </div>
                   <label class="toggle-switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="setting-autofe" checked>
                     <span class="toggle-slider"></span>
                   </label>
                 </div>
@@ -1358,7 +1362,7 @@
                     <p class="text-sm font-medium">超參數優化試驗次數</p>
                     <p class="text-xs text-dark-400">增加次數可提升效能但耗時更長</p>
                   </div>
-                  <input type="number" value="200" class="w-24 bg-dark-700 border border-dark-600 rounded-lg px-3 py-1.5 text-sm text-right focus:border-primary-500 outline-none">
+                  <input type="number" id="setting-hpotrials" value="200" class="w-24 bg-dark-700 border border-dark-600 rounded-lg px-3 py-1.5 text-sm text-right focus:border-primary-500 outline-none">
                 </div>
                 <div class="flex items-center justify-between p-3 rounded-lg bg-dark-800/50">
                   <div>
@@ -1366,7 +1370,7 @@
                     <p class="text-xs text-dark-400">訓練完成或失敗時發送通知</p>
                   </div>
                   <label class="toggle-switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="setting-email" checked>
                     <span class="toggle-slider"></span>
                   </label>
                 </div>
@@ -1381,11 +1385,11 @@
                     <p class="text-sm font-medium">啟用的演算法</p>
                     <p class="text-xs text-dark-400">選擇要包含在自動搜尋中的模型</p>
                   </div>
-                  <div class="flex gap-2">
-                    <span class="text-xs bg-primary-500/10 text-primary-400 px-2 py-1 rounded-lg">XGBoost</span>
-                    <span class="text-xs bg-primary-500/10 text-primary-400 px-2 py-1 rounded-lg">LightGBM</span>
-                    <span class="text-xs bg-primary-500/10 text-primary-400 px-2 py-1 rounded-lg">CatBoost</span>
-                    <span class="text-xs bg-dark-600 text-dark-400 px-2 py-1 rounded-lg">Random Forest</span>
+                  <div class="flex gap-2" id="setting-algos-container">
+                    <span class="setting-algo-chip text-xs bg-primary-500/10 text-primary-400 px-2 py-1 rounded-lg cursor-pointer select-none" data-val="XGBoost">XGBoost</span>
+                    <span class="setting-algo-chip text-xs bg-primary-500/10 text-primary-400 px-2 py-1 rounded-lg cursor-pointer select-none" data-val="LightGBM">LightGBM</span>
+                    <span class="setting-algo-chip text-xs bg-primary-500/10 text-primary-400 px-2 py-1 rounded-lg cursor-pointer select-none" data-val="CatBoost">CatBoost</span>
+                    <span class="setting-algo-chip text-xs bg-dark-600 text-dark-400 px-2 py-1 rounded-lg cursor-pointer select-none" data-val="Random Forest">Random Forest</span>
                   </div>
                 </div>
                 <div class="flex items-center justify-between p-3 rounded-lg bg-dark-800/50">
@@ -1393,7 +1397,7 @@
                     <p class="text-sm font-medium">交叉驗證折數</p>
                     <p class="text-xs text-dark-400">K-Fold Cross Validation</p>
                   </div>
-                  <select class="bg-dark-700 border border-dark-600 rounded-lg px-3 py-1.5 text-sm focus:border-primary-500 outline-none">
+                  <select id="setting-kfold" class="bg-dark-700 border border-dark-600 rounded-lg px-3 py-1.5 text-sm focus:border-primary-500 outline-none">
                     <option>3-Fold</option>
                     <option selected>5-Fold</option>
                     <option>10-Fold</option>
@@ -1401,6 +1405,10 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div class="px-4 pb-4 flex justify-end gap-3 mt-2 border-t border-dark-700/50 pt-4">
+            <span id="settings-save-toast" class="text-success-400 text-sm font-medium self-center opacity-0 transition-opacity">設定已儲存</span>
+            <button id="btn-save-settings" class="px-6 py-2 bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary-500/20">儲存設定</button>
           </div>
         </div>
       </section>
