@@ -114,9 +114,9 @@
         </div>
         <div class="flex items-center gap-4">
           <!-- Global Pipeline Status -->
-          <div id="global-status" class="flex items-center gap-2 bg-dark-800 rounded-lg px-3 py-1.5 text-xs">
-            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-success-500"></span></span>
-            <span class="text-dark-300">系統就緒</span>
+          <div id="global-status" class="flex items-center gap-2 bg-dark-800 rounded-lg px-3 py-1.5 text-xs whitespace-nowrap">
+            <span class="relative flex h-2 w-2 flex-shrink-0"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-success-500"></span></span>
+            <span id="global-status-text" class="text-dark-300">系統就緒</span>
           </div>
           <!-- Notification -->
           <button class="relative p-2 text-dark-400 hover:text-dark-100 transition-colors">
@@ -665,6 +665,10 @@
                 <button id="btn-view-leaderboard" onclick="navigateTo('leaderboard')" class="px-4 py-2 bg-dark-700 hover:bg-dark-600 rounded-lg text-sm font-medium transition-colors">
                   查看模型排行榜
                 </button>
+                <button id="btn-view-insights" onclick="navigateTo('insights')" class="px-4 py-2 bg-primary-600 hover:bg-primary-500 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                  洞察與 What-If 模擬
+                </button>
               </div>
             </div>
           </div>
@@ -1005,6 +1009,50 @@
                 <h3 class="card-title">殘差分佈</h3>
               </div>
               <div id="chart-real-residuals" class="h-72"></div>
+            </div>
+          </div>
+
+          <!-- Real-mode What-If Simulator -->
+          <div class="card mb-6" id="real-whatif-section">
+            <div class="card-header">
+              <h3 class="card-title flex items-center gap-2">
+                What-If 模擬器
+                <span class="text-[9px] bg-gradient-to-r from-primary-500/20 to-accent-500/20 text-accent-400 px-2 py-0.5 rounded-full font-semibold">互動式</span>
+              </h3>
+              <div class="flex items-center gap-2">
+                <select id="real-whatif-model" class="bg-dark-800 border border-dark-600 rounded-lg px-3 py-1.5 text-xs focus:border-primary-500 outline-none"></select>
+                <button id="real-whatif-reset" class="text-xs text-dark-400 hover:text-dark-200 transition-colors">重設為平均值</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4">
+              <!-- Feature Sliders -->
+              <div class="lg:col-span-2">
+                <p class="text-xs text-dark-400 mb-3">調整特徵值，即時觀察預測結果變化</p>
+                <div id="real-whatif-sliders" class="space-y-4 max-h-96 overflow-y-auto pr-2"></div>
+              </div>
+              <!-- Prediction Result -->
+              <div>
+                <div class="p-5 bg-dark-800/50 border border-dark-700/50 rounded-xl">
+                  <p class="text-xs text-dark-400 mb-2">預測結果</p>
+                  <h2 class="text-3xl font-bold mb-1 text-accent-400" id="real-whatif-prediction">—</h2>
+                  <p class="text-xs text-dark-500" id="real-whatif-target-label">目標變數</p>
+                  <div class="border-t border-dark-700/50 my-4"></div>
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-dark-400">基準預測 (平均特徵)</span>
+                      <span class="font-mono text-dark-200" id="real-whatif-baseline">—</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-dark-400">變化量 Δ</span>
+                      <span class="font-mono" id="real-whatif-delta">—</span>
+                    </div>
+                  </div>
+                  <div class="mt-4 p-3 rounded-lg bg-dark-900/50 border border-dark-700/30">
+                    <p class="text-[10px] text-dark-500 mb-1">使用模型</p>
+                    <p class="text-xs font-medium" id="real-whatif-model-name">—</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

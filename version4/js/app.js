@@ -1480,7 +1480,7 @@ function initTrainingButton() {
         document.querySelectorAll('.pipeline-node').forEach(n => n.classList.add('completed'));
         document.querySelectorAll('.pipeline-connector').forEach(c => { c.classList.add('completed'); c.classList.remove('active'); });
         const status = document.getElementById('global-status');
-        if (status) status.querySelector('span:last-child').textContent = '訓練完成';
+        if (status) { const txt = document.getElementById('global-status-text'); if (txt) txt.textContent = '訓練完成'; }
         const log = document.getElementById('training-log');
         if (log) { log.innerHTML += '<p class="text-success-400">[10:35:00] ✓ 所有模型訓練完成！最佳模型: LightGBM (F1=0.942)</p>'; log.scrollTop = log.scrollHeight; }
       }
@@ -1722,17 +1722,17 @@ async function startRealTraining(ds, targetCol, options = {}) {
       return;
     }
 
-    // Show results
-    renderExperimentResults(models, data);
+    // Show results — must un-hide BEFORE rendering charts so ECharts can compute size
     resultsCard.classList.remove('hidden');
+    renderExperimentResults(models, data);
 
     btn.innerHTML = '重新訓練';
     btn.disabled = false;
     btn.classList.remove('opacity-75');
 
     // Update global status
-    const status = document.getElementById('global-status');
-    if (status) status.querySelector('span:last-child').textContent = '訓練完成';
+    const txt = document.getElementById('global-status-text');
+    if (txt) txt.textContent = '訓練完成';
 
   } catch (err) {
     addLog(`錯誤: ${err.message}`, 'error');
@@ -1794,11 +1794,15 @@ function renderExperimentResults(models, data) {
     tbody.appendChild(tr);
   });
 
-  // Feature importance chart (best model)
+  // Feature importance chart (best model) — defer using rAF so DOM has time to layout before ECharts measures
   if (models.length > 0) {
     const best = models[0];
-    renderExpFeatureImportance(best);
-    renderExpPredictionChart(best, data);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        renderExpFeatureImportance(best);
+        renderExpPredictionChart(best, data);
+      });
+    });
   }
 }
 
@@ -1806,10 +1810,10 @@ function renderExpFeatureImportance(model) {
   const chart = initChart('chart-exp-importance');
   if (!chart) return;
 
-  const names = model.featureNames;
-  const values = model.featureImportance;
+  const names = model.featureNames || [];
+  const values = model.featureImportance || [];
   // Sort descending
-  const pairs = names.map((n, i) => ({ name: n, value: values[i] })).sort((a, b) => b.value - a.value).slice(0, 15);
+  const pairs = names.map((n, i) => ({ name: n, value: values[i] || 0 })).sort((a, b) => b.value - a.value).slice(0, 15);
 
   chart.setOption({
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, backgroundColor: '#1e293b', borderColor: '#334155', textStyle: { color: '#e2e8f0', fontSize: 11 } },
@@ -1829,6 +1833,7 @@ function renderExpFeatureImportance(model) {
       label: { show: true, position: 'right', color: '#94a3b8', fontSize: 9, formatter: p => (p.value * 100).toFixed(1) + '%' },
     }],
   });
+  chart.resize();
 }
 
 function renderExpPredictionChart(model, data) {
@@ -1877,6 +1882,7 @@ function renderExpPredictionChart(model, data) {
       }],
     });
   }
+  chart.resize();
 }
 
 // ===== REAL LEADERBOARD =====
@@ -2071,14 +2077,139 @@ function renderRealInsights() {
   document.getElementById('insight-feature-count').textContent = best.featureNames.length;
   document.getElementById('insight-model-count').textContent = models.length;
 
-  // Feature importance chart
-  renderRealFeatureImportance(best);
-  // Model comparison chart
-  renderRealModelCompare(models, isReg);
-  // Prediction scatter
-  renderRealPredScatter(best, isReg);
-  // Residuals
-  if (isReg) renderRealResiduals(best);
+  // Defer chart rendering so DOM has time to compute container sizes
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      renderRealFeatureImportance(best);
+      renderRealModelCompare(models, isReg);
+      renderRealPredScatter(best, isReg);
+      if (isReg) renderRealResiduals(best);
+      // What-If simulator (DOM-only, no ECharts; safe to call immediately too)
+      renderRealWhatIf(models);
+    });
+  });
+}
+
+// ===== REAL WHAT-IF SIMULATOR =====
+const RealWhatIfState = { currentModel: null, values: [] };
+
+function renderRealWhatIf(models) {
+  const section = document.getElementById('real-whatif-section');
+  if (!section) return;
+
+  // Filter to models that have prediction infrastructure
+  const usable = models.filter(m => m.predict && m.featureStats && m.means && m.stds);
+  if (usable.length === 0) {
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+
+  // Populate model selector
+  const modelSel = document.getElementById('real-whatif-model');
+  modelSel.innerHTML = '';
+  usable.forEach((m, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i === 0 ? `${m.name} (最佳)` : m.name;
+    modelSel.appendChild(opt);
+  });
+
+  const setModel = (idx) => {
+    RealWhatIfState.currentModel = usable[idx];
+    RealWhatIfState.values = usable[idx].featureStats.map(s => s.mean);
+    buildRealWhatIfSliders();
+    updateRealWhatIfPrediction();
+  };
+
+  modelSel.onchange = () => setModel(parseInt(modelSel.value));
+  document.getElementById('real-whatif-reset').onclick = () => {
+    RealWhatIfState.values = RealWhatIfState.currentModel.featureStats.map(s => s.mean);
+    buildRealWhatIfSliders();
+    updateRealWhatIfPrediction();
+  };
+
+  setModel(0);
+}
+
+function buildRealWhatIfSliders() {
+  const wrap = document.getElementById('real-whatif-sliders');
+  const m = RealWhatIfState.currentModel;
+  if (!wrap || !m) return;
+
+  wrap.innerHTML = '';
+  m.featureNames.forEach((name, i) => {
+    const stats = m.featureStats[i];
+    const range = stats.max - stats.min;
+    const step = range > 100 ? 1 : (range / 200 || 0.01);
+    const cur = RealWhatIfState.values[i];
+
+    const div = document.createElement('div');
+    div.className = 'slider-group';
+    div.innerHTML = `
+      <div class="flex items-center justify-between mb-1">
+        <label class="text-xs font-medium text-dark-200 truncate" title="${escapeHtml(name)}">${escapeHtml(name)}</label>
+        <span class="text-xs font-mono text-accent-400" data-val-display="${i}">${formatRwifVal(cur)}</span>
+      </div>
+      <input type="range" min="${stats.min}" max="${stats.max}" step="${step}" value="${cur}" data-feat-idx="${i}" class="slider-input w-full">
+      <div class="flex justify-between text-[9px] text-dark-500 mt-0.5">
+        <span>${formatRwifVal(stats.min)}</span>
+        <span class="text-dark-600">μ ${formatRwifVal(stats.mean)}</span>
+        <span>${formatRwifVal(stats.max)}</span>
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+
+  wrap.querySelectorAll('input[type="range"]').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const idx = parseInt(e.target.dataset.featIdx);
+      const v = parseFloat(e.target.value);
+      RealWhatIfState.values[idx] = v;
+      const display = wrap.querySelector(`[data-val-display="${idx}"]`);
+      if (display) display.textContent = formatRwifVal(v);
+      updateRealWhatIfPrediction();
+    });
+  });
+}
+
+function updateRealWhatIfPrediction() {
+  const m = RealWhatIfState.currentModel;
+  if (!m) return;
+
+  const xNorm = RealWhatIfState.values.map((v, i) => (v - m.means[i]) / (m.stds[i] || 1));
+  let pred;
+  try { pred = m.predict(xNorm); } catch (e) { pred = NaN; }
+
+  const baselineNorm = new Array(m.featureNames.length).fill(0);
+  let baseline;
+  try { baseline = m.predict(baselineNorm); } catch (e) { baseline = NaN; }
+
+  const isReg = m.taskType === 'regression';
+
+  document.getElementById('real-whatif-prediction').textContent = isReg ? formatRwifVal(pred) : `Class ${pred}`;
+  document.getElementById('real-whatif-target-label').textContent = m.targetName || '目標變數';
+  document.getElementById('real-whatif-baseline').textContent = isReg ? formatRwifVal(baseline) : `Class ${baseline}`;
+  document.getElementById('real-whatif-model-name').textContent = m.name;
+
+  if (isReg && !isNaN(pred) && !isNaN(baseline)) {
+    const delta = pred - baseline;
+    const deltaEl = document.getElementById('real-whatif-delta');
+    const sign = delta >= 0 ? '+' : '';
+    deltaEl.textContent = `${sign}${formatRwifVal(delta)}`;
+    deltaEl.className = `font-mono ${delta > 0 ? 'text-success-400' : delta < 0 ? 'text-danger-400' : 'text-dark-300'}`;
+  } else {
+    document.getElementById('real-whatif-delta').textContent = '—';
+  }
+}
+
+function formatRwifVal(v) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  const abs = Math.abs(v);
+  if (abs >= 1000) return v.toFixed(0);
+  if (abs >= 100) return v.toFixed(1);
+  if (abs >= 1) return v.toFixed(2);
+  return v.toFixed(3);
 }
 
 function renderRealFeatureImportance(model) {

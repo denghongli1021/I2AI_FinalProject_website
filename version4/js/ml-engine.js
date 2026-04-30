@@ -805,6 +805,21 @@ const MLEngine = {
         model.targetName = data.targetName;
         model.trainSize = data.trainIdx.length;
         model.testSize = data.testIdx.length;
+        model.means = data.means;
+        model.stds = data.stds;
+        // Attach per-feature min/mean/max from raw X for What-If slider ranges
+        const fStats = [];
+        for (let f = 0; f < data.nFeatures; f++) {
+          let mn = Infinity, mx = -Infinity, sum = 0;
+          for (let i = 0; i < data.X.length; i++) {
+            const v = data.X[i][f];
+            if (v < mn) mn = v;
+            if (v > mx) mx = v;
+            sum += v;
+          }
+          fStats.push({ min: mn, max: mx, mean: sum / data.X.length });
+        }
+        model.featureStats = fStats;
         models.push(model);
 
         const scoreLabel = data.taskType === 'regression' ? 'R²' : 'Accuracy';
